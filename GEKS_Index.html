@@ -654,8 +654,21 @@
           <input type="number" id="m_val" min="0" max="1" step="0.01" value="0.80" />
         </div>
         <div class="input-item">
-          <label>K<sub>norm</sub> (Kriger, 0.2&ndash;1)</label>
+          <label>K<sub>norm</sub> (Kriger, 0&ndash;1)</label>
           <input type="number" id="k_val" min="0" max="1" step="0.01" value="0.60" />
+        </div>
+      </div>
+
+      <!-- K SCALE SELECTOR -->
+      <div style="margin:16px 0 20px;padding:14px 18px;background:rgba(220,60,80,0.06);border:1px solid rgba(220,60,80,0.15);border-radius:10px;">
+        <label style="font-size:0.75em;font-weight:500;color:#dc3c50;text-transform:uppercase;letter-spacing:0.08em;display:block;margin-bottom:10px;">K Scale Mapping (Level &rarr; K<sub>norm</sub>)</label>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+          <button class="preset-btn active" id="kscale-linear" onclick="setKScale('linear')" style="border-left-color:#dc3c50;">Linear (0.20, 0.40, 0.60, 0.80, 1.00)</button>
+          <button class="preset-btn" id="kscale-log" onclick="setKScale('log')" style="border-left-color:#dc3c50;">Logarithmic (0.05, 0.15, 0.35, 0.65, 1.00)</button>
+          <button class="preset-btn" id="kscale-heavy" onclick="setKScale('heavy')" style="border-left-color:#dc3c50;">Top-heavy (0.10, 0.20, 0.40, 0.70, 1.00)</button>
+        </div>
+        <div style="font-size:0.78em;color:#8888aa;" id="kscale-display">
+          Level 1 = 0.20 &ensp; Level 2 = 0.40 &ensp; Level 3 = 0.60 &ensp; Level 4 = 0.80 &ensp; Level 5 = 1.00
         </div>
       </div>
 
@@ -769,32 +782,67 @@
 </div>
 
 <script>
-// === ORGANISM PRESETS ===
+// === K SCALE DEFINITIONS ===
+const kScales = {
+  linear: [0.20, 0.40, 0.60, 0.80, 1.00],
+  log:    [0.05, 0.15, 0.35, 0.65, 1.00],
+  heavy:  [0.10, 0.20, 0.40, 0.70, 1.00]
+};
+let currentKScale = 'linear';
+
+function setKScale(scaleName) {
+  currentKScale = scaleName;
+  const s = kScales[scaleName];
+  document.getElementById('kscale-display').innerHTML =
+    'Level 1 = ' + s[0].toFixed(2) + ' &ensp; Level 2 = ' + s[1].toFixed(2) +
+    ' &ensp; Level 3 = ' + s[2].toFixed(2) + ' &ensp; Level 4 = ' + s[3].toFixed(2) +
+    ' &ensp; Level 5 = ' + s[4].toFixed(2);
+  // Update button states
+  ['linear','log','heavy'].forEach(function(n) {
+    document.getElementById('kscale-' + n).classList.toggle('active', n === scaleName);
+  });
+  // Re-apply current preset if one is active
+  const activeBtn = document.querySelector('.preset-btn.active:not([id^="kscale"])');
+  if (activeBtn) activeBtn.click();
+}
+
+function kLevelToNorm(level) {
+  // Map a K level (1-5, including fractional) to K_norm using current scale
+  const s = kScales[currentKScale];
+  if (level <= 1) return s[0];
+  if (level >= 5) return s[4];
+  const floor = Math.floor(level);
+  const frac = level - floor;
+  if (frac === 0) return s[floor - 1];
+  return s[floor - 1] + frac * (s[floor] - s[floor - 1]);
+}
+
+// === ORGANISM PRESETS (K stored as level, mapped dynamically) ===
 const presets = [
-  { name: 'M. genitalium', cat: 'prokaryote', S:0.30, G:0.10, E:0.02, K:0.20 },
-  { name: 'E. coli', cat: 'prokaryote', S:0.45, G:0.30, E:0.05, K:0.20 },
-  { name: 'Anabaena', cat: 'prokaryote', S:0.50, G:0.45, E:0.35, K:0.30 },
-  { name: 'M. xanthus', cat: 'prokaryote', S:0.52, G:0.50, E:0.42, K:0.34 },
-  { name: 'Earthworm', cat: 'invertebrate', S:0.55, G:0.42, E:0.35, K:0.40 },
-  { name: 'Cricket', cat: 'invertebrate', S:0.62, G:0.55, E:0.52, K:0.60 },
-  { name: 'Ant', cat: 'invertebrate', S:0.65, G:0.62, E:0.68, K:0.70 },
-  { name: 'Octopus', cat: 'invertebrate', S:0.70, G:0.68, E:0.62, K:0.70 },
-  { name: 'Zebrafish', cat: 'vertebrate', S:0.60, G:0.55, E:0.48, K:0.60 },
-  { name: 'Frog', cat: 'vertebrate', S:0.63, G:0.58, E:0.55, K:0.60 },
-  { name: 'Anole', cat: 'vertebrate', S:0.65, G:0.62, E:0.62, K:0.60 },
-  { name: 'Trout', cat: 'vertebrate', S:0.68, G:0.60, E:0.58, K:0.60 },
-  { name: 'Chicken', cat: 'vertebrate', S:0.68, G:0.67, E:0.70, K:0.66 },
-  { name: 'Pigeon', cat: 'vertebrate', S:0.75, G:0.70, E:0.72, K:0.60 },
-  { name: 'Bat', cat: 'vertebrate', S:0.80, G:0.78, E:0.85, K:0.60 },
-  { name: 'Mouse', cat: 'vertebrate', S:0.75, G:0.78, E:0.80, K:0.70 },
-  { name: 'Crow', cat: 'cognitive', S:0.76, G:0.72, E:0.74, K:0.80 },
-  { name: 'Dolphin', cat: 'cognitive', S:0.80, G:0.80, E:0.72, K:0.80 },
-  { name: 'Chimpanzee', cat: 'cognitive', S:0.82, G:0.84, E:0.86, K:0.80 },
-  { name: 'Human', cat: 'cognitive', S:0.82, G:0.85, E:0.88, K:1.00 },
-  { name: 'Ant colony', cat: 'collective', S:0.72, G:0.75, E:0.68, K:0.80 },
-  { name: 'Humanity', cat: 'collective', S:0.95, G:0.97, E:0.88, K:1.00 },
-  { name: 'LLM \u2014 single chat', cat: 'ai', S:0.99, G:0.93, E:0.40, K:0.30 },
-  { name: 'LLM \u2014 full system', cat: 'ai', S:0.99, G:0.93, E:0.40, K:0.80 },
+  { name: 'M. genitalium', cat: 'prokaryote', S:0.30, G:0.10, E:0.02, Klevel:1 },
+  { name: 'E. coli', cat: 'prokaryote', S:0.45, G:0.30, E:0.05, Klevel:1 },
+  { name: 'Anabaena', cat: 'prokaryote', S:0.50, G:0.45, E:0.35, Klevel:1.5 },
+  { name: 'M. xanthus', cat: 'prokaryote', S:0.52, G:0.50, E:0.42, Klevel:1.7 },
+  { name: 'Earthworm', cat: 'invertebrate', S:0.55, G:0.42, E:0.35, Klevel:2 },
+  { name: 'Cricket', cat: 'invertebrate', S:0.62, G:0.55, E:0.52, Klevel:3 },
+  { name: 'Ant', cat: 'invertebrate', S:0.65, G:0.62, E:0.68, Klevel:3.5 },
+  { name: 'Octopus', cat: 'invertebrate', S:0.70, G:0.68, E:0.62, Klevel:3.5 },
+  { name: 'Zebrafish', cat: 'vertebrate', S:0.60, G:0.55, E:0.48, Klevel:3 },
+  { name: 'Frog', cat: 'vertebrate', S:0.63, G:0.58, E:0.55, Klevel:3 },
+  { name: 'Anole', cat: 'vertebrate', S:0.65, G:0.62, E:0.62, Klevel:3 },
+  { name: 'Trout', cat: 'vertebrate', S:0.68, G:0.60, E:0.58, Klevel:3 },
+  { name: 'Chicken', cat: 'vertebrate', S:0.68, G:0.67, E:0.70, Klevel:3.3 },
+  { name: 'Pigeon', cat: 'vertebrate', S:0.75, G:0.70, E:0.72, Klevel:3 },
+  { name: 'Bat', cat: 'vertebrate', S:0.80, G:0.78, E:0.85, Klevel:3 },
+  { name: 'Mouse', cat: 'vertebrate', S:0.75, G:0.78, E:0.80, Klevel:3.5 },
+  { name: 'Crow', cat: 'cognitive', S:0.76, G:0.72, E:0.74, Klevel:4 },
+  { name: 'Dolphin', cat: 'cognitive', S:0.80, G:0.80, E:0.72, Klevel:4 },
+  { name: 'Chimpanzee', cat: 'cognitive', S:0.82, G:0.84, E:0.86, Klevel:4 },
+  { name: 'Human', cat: 'cognitive', S:0.82, G:0.85, E:0.88, Klevel:5 },
+  { name: 'Ant colony', cat: 'collective', S:0.72, G:0.75, E:0.68, Klevel:4 },
+  { name: 'Humanity', cat: 'collective', S:0.95, G:0.97, E:0.88, Klevel:5 },
+  { name: 'LLM \u2014 single chat', cat: 'ai', S:0.99, G:0.93, E:0.40, Klevel:1.5 },
+  { name: 'LLM \u2014 full system', cat: 'ai', S:0.99, G:0.93, E:0.40, Klevel:4 },
 ];
 
 // Build preset buttons
@@ -804,12 +852,12 @@ presets.forEach(function(p) {
   btn.className = 'preset-btn cat-' + p.cat;
   btn.textContent = p.name;
   btn.onclick = function() {
-    document.querySelectorAll('.preset-btn').forEach(function(b) { b.classList.remove('active'); });
+    document.querySelectorAll('#preset-buttons .preset-btn').forEach(function(b) { b.classList.remove('active'); });
     btn.classList.add('active');
     document.getElementById('h_val').value = p.S;
     document.getElementById('e_val').value = p.G;
     document.getElementById('m_val').value = p.E;
-    document.getElementById('k_val').value = p.K;
+    document.getElementById('k_val').value = kLevelToNorm(p.Klevel).toFixed(2);
     calculate();
   };
   btnContainer.appendChild(btn);
