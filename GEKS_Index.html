@@ -537,55 +537,95 @@
         <span class="var">K</span> = <span class="var">L</span> / <span class="var">L<sub>max</sub></span> , &nbsp; where &nbsp; <span class="var">L</span> &isin; {1, 2, 3, 4, 5}
       </div>
       <p><strong>What it measures:</strong> How sophisticated is the organism's relationship with its environment? The other three components measure what an organism <em>is made of</em> &mdash; its informational content, structural organization, and evolutionary novelty. The Kriger index measures what an organism <em>does</em> with its complexity: how it maintains its boundary with the environment, how it regulates its internal state, and how actively it reshapes the world around it.</p>
-      <p><strong>How it works:</strong> Organisms are assigned to one of five functional levels based on the sophistication of their system&ndash;environment interface. This is a hierarchy of boundaries and control &mdash; from the simplest membrane-based homeostasis to the active, deliberate reconstruction of the environment through culture:</p>
+      <p><strong>How it works:</strong> Organisms are assigned to one of ten functional levels based on the sophistication of their system&ndash;environment interface. Each level adds a qualitatively new type of boundary between the organism and its world. Every level includes all preceding levels.</p>
 
-      <table class="ref-table" style="margin: 18px 0;">
+      <table class="ref-table" style="margin: 18px 0; font-size: 0.92em;">
         <thead>
-          <tr><th>Level</th><th>Name</th><th>Description</th><th>K<sub>norm</sub></th></tr>
+          <tr><th>L</th><th>Name</th><th>What is new at the boundary</th><th>Example</th><th>K<sub>norm</sub></th></tr>
         </thead>
         <tbody>
           <tr>
             <td style="text-align:center;font-weight:600;color:#dc5060;">1</td>
-            <td>Cellular</td>
-            <td>Basic homeostasis. The cell membrane serves as the boundary between self and environment. Metabolism maintains internal conditions against external fluctuations. Examples: prokaryotes, protists.</td>
-            <td>0.20</td>
+            <td>Membrane homeostasis</td>
+            <td>Lipid membrane as selective barrier. Passive and active transport maintain internal conditions.</td>
+            <td>Mycoplasma</td>
+            <td>0.10</td>
           </tr>
           <tr>
             <td style="text-align:center;font-weight:600;color:#dc5060;">2</td>
-            <td>Multicellular</td>
-            <td>Cell coordination and differentiation. Intercellular signaling creates a new layer of organization. The boundary becomes a complex tissue layer (epithelium, cuticle). Examples: sponges, cnidarians, flatworms.</td>
-            <td>0.40</td>
+            <td>Active motility</td>
+            <td>Organism selects its environment by directed movement (chemotaxis). Boundary is no longer static.</td>
+            <td><em>E. coli</em></td>
+            <td>0.20</td>
           </tr>
           <tr>
             <td style="text-align:center;font-weight:600;color:#dc5060;">3</td>
-            <td>Organ-system</td>
-            <td>Specialized organs and organ systems: digestive, circulatory, excretory, nervous. Multi-layered homeostasis with hierarchical feedback loops. The organism maintains stable internal conditions across a wide range of external variation. Examples: arthropods, mollusks, vertebrates.</td>
-            <td>0.60</td>
+            <td>Cell differentiation</td>
+            <td>Different cell types perform different functions at the boundary. Division of labour emerges.</td>
+            <td>Volvox, Anabaena</td>
+            <td>0.30</td>
           </tr>
           <tr>
             <td style="text-align:center;font-weight:600;color:#dc5060;">4</td>
-            <td>Cognitive</td>
-            <td>Complex mental processes: learning, episodic memory, problem-solving, social cognition, tool use. The system builds and updates internal models of its environment, enabling flexible, anticipatory behavior. Examples: cephalopods, corvids, parrots, primates, cetaceans.</td>
-            <td>0.80</td>
+            <td>Tissue organisation</td>
+            <td>Differentiated tissues form multi-layered boundaries. Coordinated intercellular signalling.</td>
+            <td>Sponges, cnidarians</td>
+            <td>0.40</td>
           </tr>
           <tr>
             <td style="text-align:center;font-weight:600;color:#dc5060;">5</td>
-            <td>Culture-forming</td>
-            <td>Symbolic thought, syntactic language, cumulative knowledge transmission across generations, deliberate large-scale transformation of the environment. The system doesn't just adapt to its environment &mdash; it systematically rebuilds it. Example: humans.</td>
+            <td>Organ systems</td>
+            <td>Specialised organs create nested homeostatic feedback loops. Multiple simultaneous regulatory channels.</td>
+            <td>Fish, insects</td>
+            <td>0.50</td>
+          </tr>
+          <tr>
+            <td style="text-align:center;font-weight:600;color:#dc5060;">6</td>
+            <td>Sensory integration</td>
+            <td>Centralised nervous system integrates signals from multiple sensory modalities. Coordinated responses to complex stimuli.</td>
+            <td>Reptiles, amphibians</td>
+            <td>0.60</td>
+          </tr>
+          <tr>
+            <td style="text-align:center;font-weight:600;color:#dc5060;">7</td>
+            <td>Cognitive modelling</td>
+            <td>Internal models of the environment enable anticipatory behaviour: learning, memory, problem-solving.</td>
+            <td>Crows, octopuses</td>
+            <td>0.70</td>
+          </tr>
+          <tr>
+            <td style="text-align:center;font-weight:600;color:#dc5060;">8</td>
+            <td>Social cognition</td>
+            <td>The organism models <em>other agents</em>: their intentions, knowledge states, and likely actions (theory of mind).</td>
+            <td>Chimpanzees, dolphins</td>
+            <td>0.80</td>
+          </tr>
+          <tr>
+            <td style="text-align:center;font-weight:600;color:#dc5060;">9</td>
+            <td>Symbolic communication</td>
+            <td>Internal models encoded in arbitrary symbols and transmitted through syntactic language. Knowledge transmissible across generations.</td>
+            <td>Early <em>Homo</em></td>
+            <td>0.90</td>
+          </tr>
+          <tr>
+            <td style="text-align:center;font-weight:600;color:#dc5060;">10</td>
+            <td>Cultural reflexivity</td>
+            <td>The individual is shaped by cumulative culture and consciously transforms it. Not merely transmitting culture &mdash; reflecting on, critiquing, and deliberately reconstructing it. Unique to modern humans.</td>
+            <td>Modern humans</td>
             <td>1.00</td>
           </tr>
         </tbody>
       </table>
 
       <ul class="where-list">
-        <li><em>L</em> &mdash; functional level of the organism (integer from 1 to 5)</li>
-        <li><em>L<sub>max</sub></em> = 5 (culture-forming level)</li>
-        <li><em>K<sub>norm</sub></em> = <em>L</em> / 5, yielding values in the range [0.20, 1.00]</li>
-        <li>Fractional values are permitted for intermediate cases (e.g., L = 3.5 for an octopus: organ-system level with emerging cognition)</li>
+        <li><em>L</em> &mdash; functional level of the organism (1 to 10)</li>
+        <li><em>L<sub>max</sub></em> = 10 (cultural reflexivity)</li>
+        <li><em>K<sub>norm</sub></em> = <em>L</em> / 10, yielding values in the range [0.10, 1.00]</li>
+        <li>Fractional values are permitted for intermediate cases (e.g., L = 7.5 for a species with cognitive modelling and emerging social cognition)</li>
       </ul>
 
       <div class="idea-box">
-        <strong>The key insight:</strong> An organism can have a modest genome (low Shannon), relatively simple structure (low Gell-Mann), and few morphological innovations (low Espesset), yet still exhibit extraordinary cognitive and behavioral complexity. Corvids are anatomically "just birds," but their problem-solving abilities rival those of great apes. The Kriger component ensures this functional dimension is not overlooked.
+        <strong>The organising principle:</strong> Each level adds a new <em>type of boundary</em> at the system&ndash;environment interface. Levels 1&ndash;2 are physical (membrane, motility). Levels 3&ndash;5 are structural (cell types, tissues, organs). Levels 6&ndash;7 are informational (sensory integration, predictive models). Levels 8&ndash;10 are social and symbolic (other minds, language, reflexive culture). A corvid is anatomically a &ldquo;standard bird&rdquo; yet scores Level 7 &mdash; the Kriger component captures what organisms <em>do</em>, not just what they <em>have</em>.
       </div>
     </div>
   </div>
@@ -663,12 +703,11 @@
       <div style="margin:16px 0 20px;padding:14px 18px;background:rgba(220,60,80,0.06);border:1px solid rgba(220,60,80,0.15);border-radius:10px;">
         <label style="font-size:0.75em;font-weight:500;color:#dc3c50;text-transform:uppercase;letter-spacing:0.08em;display:block;margin-bottom:10px;">K Scale Mapping (Level &rarr; K<sub>norm</sub>)</label>
         <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
-          <button class="preset-btn active" id="kscale-linear" onclick="setKScale('linear')" style="border-left-color:#dc3c50;">Linear (0.20, 0.40, 0.60, 0.80, 1.00)</button>
-          <button class="preset-btn" id="kscale-log" onclick="setKScale('log')" style="border-left-color:#dc3c50;">Logarithmic (0.05, 0.15, 0.35, 0.65, 1.00)</button>
-          <button class="preset-btn" id="kscale-heavy" onclick="setKScale('heavy')" style="border-left-color:#dc3c50;">Top-heavy (0.10, 0.20, 0.40, 0.70, 1.00)</button>
+          <button class="preset-btn active" id="kscale-linear" onclick="setKScale('linear')" style="border-left-color:#dc3c50;">Linear (0.10, 0.20, ... 1.00)</button>
+          <button class="preset-btn" id="kscale-log" onclick="setKScale('log')" style="border-left-color:#dc3c50;">Logarithmic (0.02, 0.05, ... 1.00)</button>
         </div>
-        <div style="font-size:0.78em;color:#8888aa;" id="kscale-display">
-          Level 1 = 0.20 &ensp; Level 2 = 0.40 &ensp; Level 3 = 0.60 &ensp; Level 4 = 0.80 &ensp; Level 5 = 1.00
+        <div style="font-size:0.72em;color:#8888aa;line-height:1.6;" id="kscale-display">
+          L1=0.10 &ensp;L2=0.20 &ensp;L3=0.30 &ensp;L4=0.40 &ensp;L5=0.50 &ensp;L6=0.60 &ensp;L7=0.70 &ensp;L8=0.80 &ensp;L9=0.90 &ensp;L10=1.00
         </div>
       </div>
 
@@ -782,11 +821,10 @@
 </div>
 
 <script>
-// === K SCALE DEFINITIONS ===
+// === K SCALE DEFINITIONS (10 levels) ===
 const kScales = {
-  linear: [0.20, 0.40, 0.60, 0.80, 1.00],
-  log:    [0.05, 0.15, 0.35, 0.65, 1.00],
-  heavy:  [0.10, 0.20, 0.40, 0.70, 1.00]
+  linear: [0.10, 0.20, 0.30, 0.40, 0.50, 0.60, 0.70, 0.80, 0.90, 1.00],
+  log:    [0.02, 0.05, 0.10, 0.17, 0.27, 0.40, 0.55, 0.72, 0.88, 1.00]
 };
 let currentKScale = 'linear';
 
@@ -794,23 +832,22 @@ function setKScale(scaleName) {
   currentKScale = scaleName;
   const s = kScales[scaleName];
   document.getElementById('kscale-display').innerHTML =
-    'Level 1 = ' + s[0].toFixed(2) + ' &ensp; Level 2 = ' + s[1].toFixed(2) +
-    ' &ensp; Level 3 = ' + s[2].toFixed(2) + ' &ensp; Level 4 = ' + s[3].toFixed(2) +
-    ' &ensp; Level 5 = ' + s[4].toFixed(2);
-  // Update button states
-  ['linear','log','heavy'].forEach(function(n) {
+    'L1=' + s[0].toFixed(2) + ' &ensp;L2=' + s[1].toFixed(2) +
+    ' &ensp;L3=' + s[2].toFixed(2) + ' &ensp;L4=' + s[3].toFixed(2) +
+    ' &ensp;L5=' + s[4].toFixed(2) + ' &ensp;L6=' + s[5].toFixed(2) +
+    ' &ensp;L7=' + s[6].toFixed(2) + ' &ensp;L8=' + s[7].toFixed(2) +
+    ' &ensp;L9=' + s[8].toFixed(2) + ' &ensp;L10=' + s[9].toFixed(2);
+  ['linear','log'].forEach(function(n) {
     document.getElementById('kscale-' + n).classList.toggle('active', n === scaleName);
   });
-  // Re-apply current preset if one is active
-  const activeBtn = document.querySelector('.preset-btn.active:not([id^="kscale"])');
+  const activeBtn = document.querySelector('#preset-buttons .preset-btn.active');
   if (activeBtn) activeBtn.click();
 }
 
 function kLevelToNorm(level) {
-  // Map a K level (1-5, including fractional) to K_norm using current scale
   const s = kScales[currentKScale];
   if (level <= 1) return s[0];
-  if (level >= 5) return s[4];
+  if (level >= 10) return s[9];
   const floor = Math.floor(level);
   const frac = level - floor;
   if (frac === 0) return s[floor - 1];
@@ -820,29 +857,29 @@ function kLevelToNorm(level) {
 // === ORGANISM PRESETS (K stored as level, mapped dynamically) ===
 const presets = [
   { name: 'M. genitalium', cat: 'prokaryote', S:0.30, G:0.10, E:0.02, Klevel:1 },
-  { name: 'E. coli', cat: 'prokaryote', S:0.45, G:0.30, E:0.05, Klevel:1 },
-  { name: 'Anabaena', cat: 'prokaryote', S:0.50, G:0.45, E:0.35, Klevel:1.5 },
-  { name: 'M. xanthus', cat: 'prokaryote', S:0.52, G:0.50, E:0.42, Klevel:1.7 },
-  { name: 'Earthworm', cat: 'invertebrate', S:0.55, G:0.42, E:0.35, Klevel:2 },
-  { name: 'Cricket', cat: 'invertebrate', S:0.62, G:0.55, E:0.52, Klevel:3 },
-  { name: 'Ant', cat: 'invertebrate', S:0.65, G:0.62, E:0.68, Klevel:3.5 },
-  { name: 'Octopus', cat: 'invertebrate', S:0.70, G:0.68, E:0.62, Klevel:3.5 },
-  { name: 'Zebrafish', cat: 'vertebrate', S:0.60, G:0.55, E:0.48, Klevel:3 },
-  { name: 'Frog', cat: 'vertebrate', S:0.63, G:0.58, E:0.55, Klevel:3 },
-  { name: 'Anole', cat: 'vertebrate', S:0.65, G:0.62, E:0.62, Klevel:3 },
-  { name: 'Trout', cat: 'vertebrate', S:0.68, G:0.60, E:0.58, Klevel:3 },
-  { name: 'Chicken', cat: 'vertebrate', S:0.68, G:0.67, E:0.70, Klevel:3.3 },
-  { name: 'Pigeon', cat: 'vertebrate', S:0.75, G:0.70, E:0.72, Klevel:3 },
-  { name: 'Bat', cat: 'vertebrate', S:0.80, G:0.78, E:0.85, Klevel:3 },
-  { name: 'Mouse', cat: 'vertebrate', S:0.75, G:0.78, E:0.80, Klevel:3.5 },
-  { name: 'Crow', cat: 'cognitive', S:0.76, G:0.72, E:0.74, Klevel:4 },
-  { name: 'Dolphin', cat: 'cognitive', S:0.80, G:0.80, E:0.72, Klevel:4 },
-  { name: 'Chimpanzee', cat: 'cognitive', S:0.82, G:0.84, E:0.86, Klevel:4 },
-  { name: 'Human', cat: 'cognitive', S:0.82, G:0.85, E:0.88, Klevel:5 },
-  { name: 'Ant colony', cat: 'collective', S:0.72, G:0.75, E:0.68, Klevel:4 },
-  { name: 'Humanity', cat: 'collective', S:0.95, G:0.97, E:0.88, Klevel:5 },
-  { name: 'LLM \u2014 single chat', cat: 'ai', S:0.99, G:0.93, E:0.40, Klevel:1.5 },
-  { name: 'LLM \u2014 full system', cat: 'ai', S:0.99, G:0.93, E:0.40, Klevel:4 },
+  { name: 'E. coli', cat: 'prokaryote', S:0.45, G:0.30, E:0.05, Klevel:2 },
+  { name: 'Anabaena', cat: 'prokaryote', S:0.50, G:0.45, E:0.35, Klevel:3 },
+  { name: 'M. xanthus', cat: 'prokaryote', S:0.52, G:0.50, E:0.42, Klevel:3.5 },
+  { name: 'Earthworm', cat: 'invertebrate', S:0.55, G:0.42, E:0.35, Klevel:4 },
+  { name: 'Cricket', cat: 'invertebrate', S:0.62, G:0.55, E:0.52, Klevel:5 },
+  { name: 'Ant', cat: 'invertebrate', S:0.65, G:0.62, E:0.68, Klevel:6.5 },
+  { name: 'Octopus', cat: 'invertebrate', S:0.70, G:0.68, E:0.62, Klevel:7 },
+  { name: 'Zebrafish', cat: 'vertebrate', S:0.60, G:0.55, E:0.48, Klevel:5 },
+  { name: 'Frog', cat: 'vertebrate', S:0.63, G:0.58, E:0.55, Klevel:5 },
+  { name: 'Anole', cat: 'vertebrate', S:0.65, G:0.62, E:0.62, Klevel:6 },
+  { name: 'Trout', cat: 'vertebrate', S:0.68, G:0.60, E:0.58, Klevel:5 },
+  { name: 'Chicken', cat: 'vertebrate', S:0.68, G:0.67, E:0.70, Klevel:5.5 },
+  { name: 'Pigeon', cat: 'vertebrate', S:0.75, G:0.70, E:0.72, Klevel:5 },
+  { name: 'Bat', cat: 'vertebrate', S:0.80, G:0.78, E:0.85, Klevel:5 },
+  { name: 'Mouse', cat: 'vertebrate', S:0.75, G:0.78, E:0.80, Klevel:6.5 },
+  { name: 'Crow', cat: 'cognitive', S:0.76, G:0.72, E:0.74, Klevel:7 },
+  { name: 'Dolphin', cat: 'cognitive', S:0.80, G:0.80, E:0.72, Klevel:8 },
+  { name: 'Chimpanzee', cat: 'cognitive', S:0.82, G:0.84, E:0.86, Klevel:8 },
+  { name: 'Human', cat: 'cognitive', S:0.82, G:0.85, E:0.88, Klevel:10 },
+  { name: 'Ant colony', cat: 'collective', S:0.72, G:0.75, E:0.68, Klevel:8 },
+  { name: 'Humanity', cat: 'collective', S:0.95, G:0.97, E:0.88, Klevel:10 },
+  { name: 'LLM \u2014 single chat', cat: 'ai', S:0.99, G:0.93, E:0.40, Klevel:3 },
+  { name: 'LLM \u2014 full system', cat: 'ai', S:0.99, G:0.93, E:0.40, Klevel:8 },
 ];
 
 // Build preset buttons
