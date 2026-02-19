@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GEKS Index — Gell-Mann · Espesset · Kriger · Shannon</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #0a0a0f;
+    color: #e0e0e8;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  .hero {
+    background: linear-gradient(135deg, #0d1117 0%, #161b26 50%, #1a1025 100%);
+    padding: 80px 40px 60px;
+    text-align: center;
+    border-bottom: 1px solid rgba(120, 80, 255, 0.15);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(ellipse at 30% 50%, rgba(90, 60, 200, 0.06) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 50%, rgba(40, 160, 180, 0.04) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .hero h1 {
+    font-family: 'Crimson Pro', serif;
+    font-size: 3em;
+    font-weight: 600;
+    color: #f0f0ff;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+    position: relative;
+  }
+
+  .hero .acronym {
+    font-family: 'Crimson Pro', serif;
+    font-size: 1.2em;
+    color: #a8a0d0;
+    margin-bottom: 16px;
+    letter-spacing: 0.03em;
+    position: relative;
+  }
+
+  .hero .subtitle {
+    font-size: 1.05em;
+    color: #8888aa;
+    font-weight: 300;
+    max-width: 750px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  .container {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 40px 30px;
+  }
+
+  .section {
+    margin-bottom: 55px;
+  }
+
+  .section h2 {
+    font-family: 'Crimson Pro', serif;
+    font-size: 1.8em;
+    font-weight: 600;
+    color: #c8c0f0;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(120, 80, 255, 0.12);
+  }
+
+  .section h3 {
+    font-size: 1.15em;
+    font-weight: 600;
+    color: #a8a0d0;
+    margin: 25px 0 12px;
+  }
+
+  p {
+    margin-bottom: 14px;
+    color: #b8b8cc;
+    font-size: 0.95em;
+  }
+
+  .formula-box {
+    background: linear-gradient(135deg, #12121f, #18182d);
+    border: 1px solid rgba(120, 80, 255, 0.2);
+    border-radius: 16px;
+    padding: 35px 40px;
+    margin: 25px 0;
+    text-align: center;
+    position: relative;
+  }
+
+  .formula-box::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    border-radius: 16px;
+    background: radial-gradient(ellipse at 50% 0%, rgba(100, 70, 220, 0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .formula-main {
+    font-family: 'Crimson Pro', serif;
+    font-size: 1.9em;
+    color: #e8e0ff;
+    margin-bottom: 15px;
+    letter-spacing: 0.02em;
+  }
+
+  .formula-main .var {
+    font-style: italic;
+    color: #b8a0ff;
+  }
+
+  .formula-main .subscript {
+    font-size: 0.6em;
+    vertical-align: sub;
+    color: #9090cc;
+  }
+
+  .formula-label {
+    font-size: 0.85em;
+    color: #7070a0;
+    font-style: italic;
+  }
+
+  .component-card {
+    background: rgba(18, 18, 35, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    padding: 25px 30px;
+    margin: 16px 0;
+    transition: border-color 0.3s;
+  }
+
+  .component-card:hover {
+    border-color: rgba(120, 80, 255, 0.25);
+  }
+
+  .component-card .tag {
+    display: inline-block;
+    font-size: 0.7em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 3px 10px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+  }
+
+  .tag-shannon { background: rgba(60, 180, 170, 0.15); color: #3cb4aa; }
+  .tag-gellmann { background: rgba(200, 130, 50, 0.15); color: #c88232; }
+  .tag-espesset { background: rgba(160, 80, 220, 0.15); color: #a050dc; }
+  .tag-kriger { background: rgba(220, 60, 80, 0.15); color: #dc3c50; }
+
+  .component-formula {
+    font-family: 'Crimson Pro', serif;
+    font-size: 1.4em;
+    color: #d8d0f0;
+    margin: 12px 0;
+    padding: 12px 0;
+  }
+
+  .component-formula .var { font-style: italic; }
+
+  .where-list {
+    font-size: 0.88em;
+    color: #9090b0;
+    padding-left: 20px;
+  }
+
+  .where-list li {
+    margin-bottom: 6px;
+    list-style: none;
+    position: relative;
+    padding-left: 16px;
+  }
+
+  .where-list li::before {
+    content: '\2014';
+    position: absolute;
+    left: 0;
+    color: #5050a0;
+  }
+
+  .note-box {
+    background: rgba(200, 150, 50, 0.06);
+    border-left: 3px solid rgba(200, 150, 50, 0.3);
+    padding: 16px 22px;
+    margin: 20px 0;
+    border-radius: 0 8px 8px 0;
+    font-size: 0.9em;
+    color: #b0a080;
+  }
+
+  .idea-box {
+    background: rgba(60, 180, 170, 0.06);
+    border-left: 3px solid rgba(60, 180, 170, 0.3);
+    padding: 16px 22px;
+    margin: 20px 0;
+    border-radius: 0 8px 8px 0;
+    font-size: 0.9em;
+    color: #90b8b0;
+  }
+
+  .calculator {
+    background: linear-gradient(135deg, #0f0f1e, #161630);
+    border: 1px solid rgba(120, 80, 255, 0.2);
+    border-radius: 16px;
+    padding: 35px;
+    margin: 30px 0;
+  }
+
+  .calc-title {
+    font-family: 'Crimson Pro', serif;
+    font-size: 1.4em;
+    color: #c8c0f0;
+    margin-bottom: 25px;
+  }
+
+  .input-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .input-item {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .input-item label {
+    font-size: 0.75em;
+    font-weight: 500;
+    color: #8888aa;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+
+  .input-item input {
+    background: rgba(10, 10, 20, 0.6);
+    border: 1px solid rgba(120, 80, 255, 0.15);
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: #e0e0f0;
+    font-size: 0.95em;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+    transition: border-color 0.3s;
+  }
+
+  .input-item input:focus {
+    border-color: rgba(120, 80, 255, 0.5);
+  }
+
+  .input-item input[type="number"] { -moz-appearance: textfield; }
+
+  .weight-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 25px;
+    padding: 15px 20px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+  }
+
+  .calc-btn {
+    background: linear-gradient(135deg, #4030a0, #6050c0);
+    border: none;
+    border-radius: 10px;
+    padding: 13px 35px;
+    color: #fff;
+    font-size: 0.95em;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .calc-btn:hover {
+    background: linear-gradient(135deg, #5040b0, #7060d0);
+    transform: translateY(-1px);
+  }
+
+  .result-box {
+    margin-top: 25px;
+    padding: 25px;
+    background: rgba(80, 60, 200, 0.08);
+    border: 1px solid rgba(120, 80, 255, 0.15);
+    border-radius: 12px;
+    display: none;
+  }
+
+  .result-box.visible { display: block; }
+
+  .result-value {
+    font-family: 'Crimson Pro', serif;
+    font-size: 2.4em;
+    color: #c8b0ff;
+    font-weight: 600;
+  }
+
+  .result-breakdown {
+    margin-top: 15px;
+    font-size: 0.88em;
+    color: #9090b0;
+  }
+
+  .result-breakdown span {
+    display: inline-block;
+    margin-right: 20px;
+    padding: 4px 0;
+  }
+
+  .bar-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 8px;
+  }
+
+  .bar-bg {
+    flex: 1;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.6s ease;
+  }
+
+  .bar-fill.shannon { background: linear-gradient(90deg, #2a9d8f, #3cb4aa); }
+  .bar-fill.gellmann { background: linear-gradient(90deg, #c87832, #e8a050); }
+  .bar-fill.espesset { background: linear-gradient(90deg, #7040c0, #a050dc); }
+  .bar-fill.kriger { background: linear-gradient(90deg, #c03040, #dc5060); }
+
+  .interpretation {
+    margin-top: 15px;
+    padding: 15px;
+    background: rgba(40, 40, 80, 0.3);
+    border-radius: 8px;
+    font-size: 0.88em;
+    color: #a0a0c0;
+    font-style: italic;
+  }
+
+  table.ref-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 15px 0;
+    font-size: 0.88em;
+  }
+
+  table.ref-table th {
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(120, 80, 255, 0.15);
+    color: #8888bb;
+    font-weight: 500;
+    font-size: 0.85em;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  table.ref-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    color: #b0b0cc;
+  }
+
+  @media (max-width: 700px) {
+    .hero { padding: 50px 20px 40px; }
+    .hero h1 { font-size: 2.2em; }
+    .container { padding: 25px 18px; }
+    .input-group, .weight-row { grid-template-columns: 1fr 1fr; }
+    .formula-main { font-size: 1.3em; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>THE GEKS INDEX</h1>
+  <div class="acronym"><strong>G</strong>ell-Mann &middot; <strong>E</strong>spesset &middot; <strong>K</strong>riger &middot; <strong>S</strong>hannon</div>
+  <p class="subtitle">A composite index for measuring biological complexity across four dimensions: informational diversity, effective structure, morpho-evolutionary innovation, and functional organization.</p>
+</div>
+
+<div class="container">
+
+  <!-- PROBLEM -->
+  <div class="section">
+    <h2>The Problem</h2>
+    <p>Biological complexity is widely discussed but rarely measured. Is a crow more complex than a trout? Is an octopus more complex than a cricket? Intuitively, the answers seem obvious, but science requires more than intuition.</p>
+    <p>Existing approaches each capture only one facet of complexity. Shannon entropy measures informational diversity but cannot distinguish meaningful structure from random noise. Gell-Mann's effective complexity captures meaningful structure but is notoriously hard to compute for real organisms. Phylogenetic trait matrices can count evolutionary innovations, but the result depends entirely on which traits the researcher chooses to include. None of these alone provides a satisfying measure of biological complexity.</p>
+    <p>The GEKS Index addresses this by combining four complementary measures into a single weighted composite score. Each component captures a different dimension of what it means to be "complex," and together they provide a richer, more robust picture than any single metric alone.</p>
+  </div>
+
+  <!-- MAIN FORMULA -->
+  <div class="section">
+    <h2>The Formula</h2>
+    <div class="formula-box">
+      <div class="formula-main">
+        <span class="var">GEKS</span> = <span class="var">&alpha;</span> &middot; <span class="var">S</span><span class="subscript">norm</span> + <span class="var">&beta;</span> &middot; <span class="var">G</span><span class="subscript">norm</span> + <span class="var">&gamma;</span> &middot; <span class="var">E</span><span class="subscript">norm</span> + <span class="var">&delta;</span> &middot; <span class="var">K</span><span class="subscript">norm</span>
+      </div>
+      <div class="formula-label">where &alpha; + &beta; + &gamma; + &delta; = 1, and all components are normalized to [0, 1]</div>
+    </div>
+    <p>The index is a weighted sum of four normalized components. Each measures a distinct aspect of biological complexity. The weighting coefficients &alpha;, &beta;, &gamma;, &delta; are adjustable depending on the research context and available data. When all four are equal (0.25 each), no dimension is privileged over any other.</p>
+  </div>
+
+  <!-- FOUR COMPONENTS -->
+  <div class="section">
+    <h2>The Four Components</h2>
+
+    <!-- SHANNON -->
+    <div class="component-card">
+      <span class="tag tag-shannon">S &mdash; Shannon</span>
+      <h3>S<sub>norm</sub> &mdash; Informational Diversity</h3>
+      <div class="component-formula">
+        <span class="var">S</span> = &minus; &Sigma; <span class="var">p<sub>i</sub></span> &middot; log<sub>2</sub>(<span class="var">p<sub>i</sub></span>)
+      </div>
+      <p><strong>What it measures:</strong> How diverse and evenly distributed are the building blocks of the organism? Shannon entropy, originally developed in information theory by Claude Shannon (1948), quantifies the amount of "surprise" or "information" in a system. Applied to biology, it can measure the diversity of nucleotides, codons, protein domains, cell types, tissue types, or any discrete biological unit.</p>
+      <p><strong>How it works:</strong> If all element types are equally frequent, entropy is maximal. If one type dominates, entropy is low. A genome with rich codon diversity scores higher than one dominated by a few repeated sequences.</p>
+      <ul class="where-list">
+        <li><em>p<sub>i</sub></em> &mdash; frequency of the <em>i</em>-th element type in the system</li>
+        <li>Normalization: <em>S<sub>norm</sub></em> = <em>S</em> / <em>S<sub>max</sub></em>, where <em>S<sub>max</sub></em> = log<sub>2</sub>(<em>n</em>) and <em>n</em> is the number of element types</li>
+        <li><em>S<sub>norm</sub></em> &rarr; 1: maximum diversity (uniform distribution)</li>
+        <li><em>S<sub>norm</sub></em> &rarr; 0: minimum diversity (one type dominates)</li>
+      </ul>
+      <div class="note-box">
+        <strong>Limitation:</strong> High Shannon entropy does not always mean high complexity. Random noise has maximum entropy but zero meaningful structure. This is precisely why the Gell-Mann component is essential.
+      </div>
+    </div>
+
+    <!-- GELL-MANN -->
+    <div class="component-card">
+      <span class="tag tag-gellmann">G &mdash; Gell-Mann</span>
+      <h3>G<sub>norm</sub> &mdash; Effective Complexity</h3>
+      <div class="component-formula">
+        <span class="var">G</span> = <span class="var">L</span>(<span class="var">R</span>) &mdash; length of the compressed description of the system's regularities
+      </div>
+      <p><strong>What it measures:</strong> How much meaningful, non-random structure does the organism contain? Effective complexity, as defined by Murray Gell-Mann and Seth Lloyd, separates the structured (regular) information in a system from its random (incompressible) component. It measures the length of the shortest possible description of the system's patterns and regularities, ignoring random variation.</p>
+      <p><strong>How it works:</strong> A crystal has low effective complexity because its repeating pattern can be described very briefly. Random gas also has low effective complexity because it contains no patterns to describe at all. Biological systems sit at the peak: they contain vast amounts of non-trivial, hierarchical structure. A genome full of regulatory networks, feedback loops, and modular gene families has very high effective complexity.</p>
+      <ul class="where-list">
+        <li><em>L(R)</em> &mdash; length of the description of the set of regularities <em>R</em></li>
+        <li>Operational proxy: difference between uncompressed and compressed data size (e.g., genome before and after algorithmic compression)</li>
+        <li>Normalization: relative to the maximum value in the study sample</li>
+      </ul>
+      <div class="idea-box">
+        <strong>Intuition:</strong> Shannon tells you how much total information is in the system. Gell-Mann tells you how much of that information is <em>organized</em>. Together, they distinguish a complex organism (high on both) from random noise (high Shannon, low Gell-Mann) and from a simple repetitive structure (low on both).
+      </div>
+    </div>
+
+    <!-- ESPESSET -->
+    <div class="component-card">
+      <span class="tag tag-espesset">E &mdash; Espesset</span>
+      <h3>E<sub>norm</sub> &mdash; Morpho-Evolutionary Complexity</h3>
+      <div class="component-formula">
+        <span class="var">E</span> = (1/<span class="var">K</span>) &middot; &Sigma;<sub><span class="var">k</span>=1..<span class="var">K</span></sub> ( &Sigma;<sub><span class="var">j</span></sub> <span class="var">c<sub>ij</sub></span> / <span class="var">N<sub>k</sub></span> )
+      </div>
+      <p><strong>What it measures:</strong> How many evolutionary innovations has an organism accumulated over geological time? This component, proposed by David Espesset, repurposes phylogenetic character matrices &mdash; tables normally used to build evolutionary trees &mdash; as a tool for quantifying morphological and genetic novelty.</p>
+      <p><strong>How it works:</strong> In a phylogenetic character matrix, each row represents a species and each column a trait. A "1" indicates the derived (evolutionarily novel) state; a "0" indicates the ancestral state. For each species, we sum the derived states and normalize by the number of traits in that matrix. This is then averaged across many different matrices &mdash; morphological, molecular, anatomical &mdash; to produce a robust mean score.</p>
+      <ul class="where-list">
+        <li><em>K</em> &mdash; total number of phylogenetic matrices used</li>
+        <li><em>c<sub>ij</sub></em> &mdash; value of the <em>j</em>-th character for species <em>i</em> (0 or 1) in a given matrix</li>
+        <li><em>N<sub>k</sub></em> &mdash; number of characters in the <em>k</em>-th matrix (normalizing divisor)</li>
+        <li>Normalization: <em>E<sub>norm</sub></em> = <em>E</em> / <em>E<sub>max</sub></em> across the study sample</li>
+      </ul>
+      <div class="note-box">
+        <strong>Why average across many matrices?</strong> Any single matrix reflects the researcher's choice of traits and can be biased. Averaging across hundreds of independently constructed matrices &mdash; morphological, molecular, developmental &mdash; dilutes individual biases and converges toward a more objective measure of accumulated evolutionary innovation.
+      </div>
+    </div>
+
+    <!-- KRIGER -->
+    <div class="component-card">
+      <span class="tag tag-kriger">K &mdash; Kriger</span>
+      <h3>K<sub>norm</sub> &mdash; Functional Complexity (System&ndash;Environment Interface)</h3>
+      <div class="component-formula">
+        <span class="var">K</span> = <span class="var">L</span> / <span class="var">L<sub>max</sub></span> , &nbsp; where &nbsp; <span class="var">L</span> &isin; {1, 2, 3, 4, 5}
+      </div>
+      <p><strong>What it measures:</strong> How sophisticated is the organism's relationship with its environment? The other three components measure what an organism <em>is made of</em> &mdash; its informational content, structural organization, and evolutionary novelty. The Kriger index measures what an organism <em>does</em> with its complexity: how it maintains its boundary with the environment, how it regulates its internal state, and how actively it reshapes the world around it.</p>
+      <p><strong>How it works:</strong> Organisms are assigned to one of five functional levels based on the sophistication of their system&ndash;environment interface. This is a hierarchy of boundaries and control &mdash; from the simplest membrane-based homeostasis to the active, deliberate reconstruction of the environment through culture:</p>
+
+      <table class="ref-table" style="margin: 18px 0;">
+        <thead>
+          <tr><th>Level</th><th>Name</th><th>Description</th><th>K<sub>norm</sub></th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="text-align:center;font-weight:600;color:#dc5060;">1</td>
+            <td>Cellular</td>
+            <td>Basic homeostasis. The cell membrane serves as the boundary between self and environment. Metabolism maintains internal conditions against external fluctuations. Examples: prokaryotes, protists.</td>
+            <td>0.20</td>
+          </tr>
+          <tr>
+            <td style="text-align:center;font-weight:600;color:#dc5060;">2</td>
+            <td>Multicellular</td>
+            <td>Cell coordination and differentiation. Intercellular signaling creates a new layer of organization. The boundary becomes a complex tissue layer (epithelium, cuticle). Examples: sponges, cnidarians, flatworms.</td>
+            <td>0.40</td>
+          </tr>
+          <tr>
+            <td style="text-align:center;font-weight:600;color:#dc5060;">3</td>
+            <td>Organ-system</td>
+            <td>Specialized organs and organ systems: digestive, circulatory, excretory, nervous. Multi-layered homeostasis with hierarchical feedback loops. The organism maintains stable internal conditions across a wide range of external variation. Examples: arthropods, mollusks, vertebrates.</td>
+            <td>0.60</td>
+          </tr>
+          <tr>
+            <td style="text-align:center;font-weight:600;color:#dc5060;">4</td>
+            <td>Cognitive</td>
+            <td>Complex mental processes: learning, episodic memory, problem-solving, social cognition, tool use. The system builds and updates internal models of its environment, enabling flexible, anticipatory behavior. Examples: cephalopods, corvids, parrots, primates, cetaceans.</td>
+            <td>0.80</td>
+          </tr>
+          <tr>
+            <td style="text-align:center;font-weight:600;color:#dc5060;">5</td>
+            <td>Culture-forming</td>
+            <td>Symbolic thought, syntactic language, cumulative knowledge transmission across generations, deliberate large-scale transformation of the environment. The system doesn't just adapt to its environment &mdash; it systematically rebuilds it. Example: humans.</td>
+            <td>1.00</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <ul class="where-list">
+        <li><em>L</em> &mdash; functional level of the organism (integer from 1 to 5)</li>
+        <li><em>L<sub>max</sub></em> = 5 (culture-forming level)</li>
+        <li><em>K<sub>norm</sub></em> = <em>L</em> / 5, yielding values in the range [0.20, 1.00]</li>
+        <li>Fractional values are permitted for intermediate cases (e.g., L = 3.5 for an octopus: organ-system level with emerging cognition)</li>
+      </ul>
+
+      <div class="idea-box">
+        <strong>The key insight:</strong> An organism can have a modest genome (low Shannon), relatively simple structure (low Gell-Mann), and few morphological innovations (low Espesset), yet still exhibit extraordinary cognitive and behavioral complexity. Corvids are anatomically "just birds," but their problem-solving abilities rival those of great apes. The Kriger component ensures this functional dimension is not overlooked.
+      </div>
+    </div>
+  </div>
+
+  <!-- WHY FOUR -->
+  <div class="section">
+    <h2>Why Four Dimensions?</h2>
+    <p>Each component answers a fundamentally different question about the organism:</p>
+    <table class="ref-table">
+      <thead>
+        <tr><th>Component</th><th>Core Question</th><th>What It Captures</th></tr>
+      </thead>
+      <tbody>
+        <tr><td style="color:#3cb4aa;font-weight:600;">S (Shannon)</td><td>How diverse are its building blocks?</td><td>Informational variety</td></tr>
+        <tr><td style="color:#c88232;font-weight:600;">G (Gell-Mann)</td><td>How much of that information is organized?</td><td>Meaningful structure</td></tr>
+        <tr><td style="color:#a050dc;font-weight:600;">E (Espesset)</td><td>How many evolutionary innovations has it accumulated?</td><td>Morpho-evolutionary novelty</td></tr>
+        <tr><td style="color:#dc3c50;font-weight:600;">K (Kriger)</td><td>What does it do with its complexity?</td><td>Functional organization</td></tr>
+      </tbody>
+    </table>
+    <p>These four dimensions are partially independent. Two organisms can have the same overall GEKS score but for entirely different reasons. A bat and a crow, for example, may score identically &mdash; but the bat achieves this through morphological innovations (powered flight, echolocation), while the crow achieves it through cognitive sophistication (tool manufacture, causal reasoning). The GEKS Index captures this multidimensional profile, turning a single score into a window on qualitatively different kinds of complexity.</p>
+  </div>
+
+  <!-- WEIGHTS -->
+  <div class="section">
+    <h2>Choosing Weights</h2>
+    <p>The weighting coefficients &alpha;, &beta;, &gamma;, &delta; must sum to 1 and are chosen based on the research question and data availability. The following presets are suggested starting points:</p>
+    <table class="ref-table">
+      <thead>
+        <tr><th>Scenario</th><th>&alpha; (S)</th><th>&beta; (G)</th><th>&gamma; (E)</th><th>&delta; (K)</th><th>Rationale</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Balanced (default)</td><td>0.25</td><td>0.25</td><td>0.25</td><td>0.25</td><td>No dimension privileged; recommended when all data types are available</td></tr>
+        <tr><td>Genomic focus</td><td>0.35</td><td>0.35</td><td>0.10</td><td>0.20</td><td>Full genome available; information-theoretic measures most reliable</td></tr>
+        <tr><td>Paleontological focus</td><td>0.10</td><td>0.15</td><td>0.55</td><td>0.20</td><td>Fossil organisms; only morphological data available</td></tr>
+        <tr><td>Information-theoretic</td><td>0.30</td><td>0.40</td><td>0.10</td><td>0.20</td><td>Emphasis on structure vs. randomness distinction</td></tr>
+        <tr><td>Ecological / behavioral</td><td>0.15</td><td>0.15</td><td>0.20</td><td>0.50</td><td>Focus on cognitive ecology, niche construction, behavioral complexity</td></tr>
+      </tbody>
+    </table>
+    <p>Researchers must always report their chosen weights. Sensitivity analysis &mdash; recalculating GEKS with different weight presets &mdash; is recommended to test the robustness of conclusions.</p>
+  </div>
+
+  <!-- CALCULATOR -->
+  <div class="section">
+    <h2>Interactive Calculator</h2>
+    <div class="calculator">
+      <div class="calc-title">Compute GEKS Index</div>
+
+      <div class="input-group">
+        <div class="input-item">
+          <label>S<sub>norm</sub> (Shannon, 0&ndash;1)</label>
+          <input type="number" id="h_val" min="0" max="1" step="0.01" value="0.72" />
+        </div>
+        <div class="input-item">
+          <label>G<sub>norm</sub> (Gell-Mann, 0&ndash;1)</label>
+          <input type="number" id="e_val" min="0" max="1" step="0.01" value="0.65" />
+        </div>
+        <div class="input-item">
+          <label>E<sub>norm</sub> (Espesset, 0&ndash;1)</label>
+          <input type="number" id="m_val" min="0" max="1" step="0.01" value="0.80" />
+        </div>
+        <div class="input-item">
+          <label>K<sub>norm</sub> (Kriger, 0.2&ndash;1)</label>
+          <input type="number" id="k_val" min="0" max="1" step="0.01" value="0.60" />
+        </div>
+      </div>
+
+      <div class="weight-row">
+        <div class="input-item">
+          <label>&alpha; (Shannon weight)</label>
+          <input type="number" id="w_a" min="0" max="1" step="0.01" value="0.25" />
+        </div>
+        <div class="input-item">
+          <label>&beta; (Gell-Mann weight)</label>
+          <input type="number" id="w_b" min="0" max="1" step="0.01" value="0.25" />
+        </div>
+        <div class="input-item">
+          <label>&gamma; (Espesset weight)</label>
+          <input type="number" id="w_g" min="0" max="1" step="0.01" value="0.25" />
+        </div>
+        <div class="input-item">
+          <label>&delta; (Kriger weight)</label>
+          <input type="number" id="w_d" min="0" max="1" step="0.01" value="0.25" />
+        </div>
+      </div>
+
+      <button class="calc-btn" onclick="calculate()">Calculate GEKS</button>
+
+      <div class="result-box" id="result-box">
+        <div style="font-size:0.78em;color:#7070a0;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Result</div>
+        <div class="result-value" id="result-val">&mdash;</div>
+
+        <div class="result-breakdown" id="result-breakdown"></div>
+
+        <div style="margin-top:18px;">
+          <div class="bar-container">
+            <span style="font-size:0.78em;color:#3cb4aa;width:90px;">Shannon</span>
+            <div class="bar-bg"><div class="bar-fill shannon" id="bar-h" style="width:0%"></div></div>
+            <span style="font-size:0.82em;color:#8888aa;width:50px;text-align:right;" id="bar-h-val"></span>
+          </div>
+          <div class="bar-container">
+            <span style="font-size:0.78em;color:#c88232;width:90px;">Gell-Mann</span>
+            <div class="bar-bg"><div class="bar-fill gellmann" id="bar-e" style="width:0%"></div></div>
+            <span style="font-size:0.82em;color:#8888aa;width:50px;text-align:right;" id="bar-e-val"></span>
+          </div>
+          <div class="bar-container">
+            <span style="font-size:0.78em;color:#a050dc;width:90px;">Espesset</span>
+            <div class="bar-bg"><div class="bar-fill espesset" id="bar-m" style="width:0%"></div></div>
+            <span style="font-size:0.82em;color:#8888aa;width:50px;text-align:right;" id="bar-m-val"></span>
+          </div>
+          <div class="bar-container">
+            <span style="font-size:0.78em;color:#dc3c50;width:90px;">Kriger</span>
+            <div class="bar-bg"><div class="bar-fill kriger" id="bar-k" style="width:0%"></div></div>
+            <span style="font-size:0.82em;color:#8888aa;width:50px;text-align:right;" id="bar-k-val"></span>
+          </div>
+        </div>
+
+        <div class="interpretation" id="interpretation"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXAMPLE -->
+  <div class="section">
+    <h2>Illustrative Example</h2>
+    <p>The following table shows hypothetical GEKS values for a range of organisms, using balanced weights (&alpha; = &beta; = &gamma; = &delta; = 0.25). All values are illustrative, not empirical.</p>
+    <table class="ref-table">
+      <thead>
+        <tr><th>Organism</th><th>S<sub>norm</sub></th><th>G<sub>norm</sub></th><th>E<sub>norm</sub></th><th>K<sub>norm</sub></th><th>GEKS</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><em>E. coli</em></td><td>0.45</td><td>0.30</td><td>0.05</td><td>0.20</td><td>0.25</td></tr>
+        <tr><td>Earthworm</td><td>0.55</td><td>0.42</td><td>0.35</td><td>0.40</td><td>0.43</td></tr>
+        <tr><td>Cricket</td><td>0.62</td><td>0.55</td><td>0.52</td><td>0.60</td><td>0.57</td></tr>
+        <tr><td>Trout</td><td>0.68</td><td>0.60</td><td>0.58</td><td>0.60</td><td>0.62</td></tr>
+        <tr><td>Octopus</td><td>0.70</td><td>0.68</td><td>0.62</td><td>0.70</td><td>0.68</td></tr>
+        <tr><td>Pigeon</td><td>0.75</td><td>0.70</td><td>0.72</td><td>0.60</td><td>0.69</td></tr>
+        <tr><td>Crow</td><td>0.76</td><td>0.72</td><td>0.74</td><td>0.80</td><td>0.76</td></tr>
+        <tr><td>Bat</td><td>0.80</td><td>0.78</td><td>0.85</td><td>0.60</td><td>0.76</td></tr>
+        <tr><td>Chimpanzee</td><td>0.82</td><td>0.84</td><td>0.86</td><td>0.80</td><td>0.83</td></tr>
+        <tr><td>Human</td><td>0.82</td><td>0.85</td><td>0.88</td><td>1.00</td><td>0.89</td></tr>
+      </tbody>
+    </table>
+    <p style="font-style:italic;color:#8080a0;font-size:0.85em;">Note the crow and bat: identical GEKS scores (0.76) achieved through different paths. The bat excels on Espesset (morphological innovations: powered flight, echolocation). The crow excels on Kriger (functional complexity: tool manufacture, causal reasoning, social cognition). The composite score is the same, but the complexity profiles are qualitatively different.</p>
+  </div>
+
+  <!-- PROPERTIES -->
+  <div class="section">
+    <h2>Properties</h2>
+
+    <h3>Strengths</h3>
+    <p><strong>Modularity.</strong> If one component is unavailable (e.g., no genomic data for a fossil), the formula reduces to three, two, or even one component with renormalized weights. The index degrades gracefully rather than becoming unusable.</p>
+    <p><strong>Multidimensionality.</strong> Four components cover informational (S), structural (G), evolutionary (E), and functional (K) aspects of complexity. Organisms with identical total scores may have entirely different complexity profiles &mdash; and this is informative, not a flaw.</p>
+    <p><strong>Scalability.</strong> Each component can be computed at different levels of biological organization &mdash; from genome to cell to organism to ecosystem &mdash; allowing the index to be applied across scales.</p>
+    <p><strong>Falsifiability.</strong> The index generates testable predictions. For example: on average, more phylogenetically derived lineages should exhibit higher GEKS scores. This can be verified against empirical data.</p>
+
+    <h3>Limitations</h3>
+    <p><strong>Weight selection is subjective.</strong> Different weight presets produce different rankings. This is mitigated by transparency (weights must be reported) and sensitivity analysis, but not eliminated entirely.</p>
+    <p><strong>Normalization is sample-dependent.</strong> All components are normalized relative to the study sample, so GEKS values are meaningful only within a given comparison group, not as absolute measures.</p>
+    <p><strong>Effective complexity is hard to compute.</strong> The Gell-Mann component requires approximation (e.g., via compression ratios), and different approximation methods may yield somewhat different results.</p>
+    <p><strong>The Kriger scale is discrete.</strong> Five levels inevitably simplify a continuous spectrum of cognitive and functional abilities. Fractional values help, but the boundaries between levels require careful, evidence-based justification.</p>
+    <p><strong>This is not scalism.</strong> The GEKS Index does not rank organisms as "higher" or "lower," "superior" or "inferior." It quantifies accumulated innovations and functional organization along multiple independent axes. Two organisms with equal scores can be complex in entirely different ways, and a high score does not imply evolutionary "superiority."</p>
+  </div>
+
+  <!-- APPLICATIONS -->
+  <div class="section">
+    <h2>Potential Applications</h2>
+    <p><strong>Comparative evolutionary biology.</strong> Compare rates of complexity increase across different lineages and geological periods. Which clades have complexified fastest? Has complexity evolution been constant or punctuated?</p>
+    <p><strong>Paleobiology.</strong> Using the Espesset component with high weight, estimate relative complexity of fossil organisms from morphological data alone &mdash; the only data available for most of life's history.</p>
+    <p><strong>Cognitive ecology.</strong> Using the Kriger component with high weight, investigate the relationship between functional complexity and ecological niche, social structure, brain size, or lifespan.</p>
+    <p><strong>Astrobiology.</strong> If life is discovered elsewhere, the GEKS framework provides a ready-made scale for characterizing its complexity level &mdash; from single-celled homeostasis to (hypothetically) culture-forming cognition.</p>
+    <p><strong>Punctuated equilibria.</strong> If complexity increases are concentrated at specific moments in geological time (as predicted by the theory of punctuated equilibria), this should be detectable as step-changes in GEKS scores across a phylogeny.</p>
+  </div>
+
+</div>
+
+<script>
+function calculate() {
+  const h = parseFloat(document.getElementById('h_val').value) || 0;
+  const e = parseFloat(document.getElementById('e_val').value) || 0;
+  const m = parseFloat(document.getElementById('m_val').value) || 0;
+  const k = parseFloat(document.getElementById('k_val').value) || 0;
+  const a = parseFloat(document.getElementById('w_a').value) || 0;
+  const b = parseFloat(document.getElementById('w_b').value) || 0;
+  const g = parseFloat(document.getElementById('w_g').value) || 0;
+  const d = parseFloat(document.getElementById('w_d').value) || 0;
+
+  const sumW = a + b + g + d;
+  const geks = (a * h + b * e + g * m + d * k);
+
+  const box = document.getElementById('result-box');
+  box.classList.add('visible');
+
+  document.getElementById('result-val').textContent = geks.toFixed(3);
+
+  const contribS = (a * h);
+  const contribG = (b * e);
+  const contribE = (g * m);
+  const contribK = (d * k);
+
+  document.getElementById('result-breakdown').innerHTML =
+    '<span>\u03b1\u00b7S = ' + contribS.toFixed(3) + '</span>' +
+    '<span>\u03b2\u00b7G = ' + contribG.toFixed(3) + '</span>' +
+    '<span>\u03b3\u00b7E = ' + contribE.toFixed(3) + '</span>' +
+    '<span>\u03b4\u00b7K = ' + contribK.toFixed(3) + '</span>' +
+    (Math.abs(sumW - 1) > 0.01 ? '<br><span style="color:#c88232;">\u26a0 Weights sum to ' + sumW.toFixed(2) + ' \u2260 1</span>' : '');
+
+  document.getElementById('bar-h').style.width = (h * 100) + '%';
+  document.getElementById('bar-e').style.width = (e * 100) + '%';
+  document.getElementById('bar-m').style.width = (m * 100) + '%';
+  document.getElementById('bar-k').style.width = (k * 100) + '%';
+  document.getElementById('bar-h-val').textContent = h.toFixed(2);
+  document.getElementById('bar-e-val').textContent = e.toFixed(2);
+  document.getElementById('bar-m-val').textContent = m.toFixed(2);
+  document.getElementById('bar-k-val').textContent = k.toFixed(2);
+
+  var interp = '';
+  if (geks < 0.2) interp = 'Very low complexity \u2014 typical of simple prokaryotes and viruses. Minimal homeostasis, cellular-level interaction with the environment.';
+  else if (geks < 0.35) interp = 'Low complexity \u2014 level of complex unicellulars or simple multicellulars. Basic cell coordination and differentiation.';
+  else if (geks < 0.5) interp = 'Moderate complexity \u2014 level of invertebrates with developed organ systems. Multi-layered homeostasis with feedback mechanisms.';
+  else if (geks < 0.65) interp = 'Medium complexity \u2014 level of vertebrates with specialized organs and systems. Emergence of complex behavior.';
+  else if (geks < 0.8) interp = 'High complexity \u2014 level of higher vertebrates with advanced nervous systems, cognitive abilities, and social behavior.';
+  else interp = 'Very high complexity \u2014 level of organisms with culture-forming cognition: symbolic communication, cumulative culture, deliberate transformation of the environment.';
+
+  document.getElementById('interpretation').textContent = interp;
+}
+</script>
+
+</body>
+</html>
