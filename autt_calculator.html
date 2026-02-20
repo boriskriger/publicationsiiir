@@ -3,610 +3,318 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AUTT-UBI Fiscal Calculator</title>
+<title>AUTT-UBI Fiscal Calculator — IIIR</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #0a0e17;
-  --surface: #111827;
-  --surface2: #1a2235;
-  --border: #2a3550;
-  --text: #e2e8f0;
-  --text2: #94a3b8;
-  --accent: #38bdf8;
-  --accent2: #818cf8;
-  --green: #4ade80;
-  --red: #f87171;
-  --gold: #fbbf24;
-  --glow: rgba(56, 189, 248, 0.08);
-}
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body {
-  font-family: 'DM Sans', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  line-height: 1.6;
-}
-.container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-
-header {
-  text-align: center;
-  padding: 40px 20px 30px;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 30px;
-}
-header h1 {
-  font-family: 'DM Serif Display', serif;
-  font-size: 2.2em;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 8px;
-}
-header p { color: var(--text2); font-size: 0.95em; max-width: 700px; margin: 0 auto; }
-header .subtitle { font-size: 0.8em; color: var(--text2); opacity: 0.6; margin-top: 4px; }
-
-.grid { display: grid; grid-template-columns: 340px 1fr; gap: 24px; }
-@media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
-
-.panel {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 24px;
-}
-.panel h2 {
-  font-family: 'DM Serif Display', serif;
-  font-size: 1.15em;
-  color: var(--accent);
-  margin-bottom: 16px;
-  display: flex; align-items: center; gap: 8px;
-}
-.panel h2 .icon { font-size: 1.2em; }
-
-.input-group { margin-bottom: 16px; }
-.input-group label {
-  display: block;
-  font-size: 0.78em;
-  font-weight: 500;
-  color: var(--text2);
-  margin-bottom: 5px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-.input-group input, .input-group select {
-  width: 100%;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 10px 12px;
-  color: var(--text);
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.9em;
-  transition: border-color 0.2s;
-}
-.input-group input:focus, .input-group select:focus {
-  outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--glow);
-}
-.input-group .hint { font-size: 0.7em; color: var(--text2); opacity: 0.6; margin-top: 3px; }
-
-.slider-group { margin-bottom: 16px; }
-.slider-group label {
-  display: flex; justify-content: space-between; align-items: center;
-  font-size: 0.78em; font-weight: 500; color: var(--text2);
-  text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px;
-}
-.slider-group label span {
-  font-family: 'JetBrains Mono', monospace;
-  color: var(--accent); font-size: 1.1em;
-}
-input[type="range"] {
-  width: 100%; height: 6px; -webkit-appearance: none; appearance: none;
-  background: var(--surface2); border-radius: 3px; outline: none;
-}
-input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none; width: 18px; height: 18px;
-  background: var(--accent); border-radius: 50%; cursor: pointer;
-  box-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
-}
-
-.results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-@media (max-width: 600px) { .results-grid { grid-template-columns: 1fr; } }
-
-.result-card {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 16px;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-.result-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-}
-.result-card .label {
-  font-size: 0.72em; text-transform: uppercase; letter-spacing: 0.5px;
-  color: var(--text2); margin-bottom: 4px;
-}
-.result-card .value {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 1.5em; font-weight: 700;
-}
-.result-card .detail { font-size: 0.75em; color: var(--text2); margin-top: 4px; }
-.result-card.positive .value { color: var(--green); }
-.result-card.negative .value { color: var(--red); }
-.result-card.neutral .value { color: var(--accent); }
-.result-card.gold .value { color: var(--gold); }
-.result-card.full-width { grid-column: 1 / -1; }
-
-.comparison-bar {
-  height: 28px; border-radius: 6px; overflow: hidden;
-  display: flex; margin: 8px 0; background: var(--surface);
-}
-.comparison-bar .segment {
-  display: flex; align-items: center; justify-content: center;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.7em; font-weight: 600; color: #fff;
-  transition: width 0.5s ease;
-}
-
-.section-divider {
-  border: none; border-top: 1px solid var(--border);
-  margin: 20px 0;
-}
-
-.cascade-viz {
-  display: flex; align-items: center; gap: 2px;
-  margin: 10px 0; flex-wrap: wrap;
-}
-.cascade-step {
-  height: 24px; border-radius: 4px;
-  display: flex; align-items: center; justify-content: center;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.6em; color: #fff; font-weight: 600;
-  transition: width 0.4s ease;
-}
-.cascade-arrow { color: var(--text2); font-size: 0.7em; }
-
-.tab-bar {
-  display: flex; gap: 4px; margin-bottom: 16px;
-  border-bottom: 1px solid var(--border); padding-bottom: 8px;
-}
-.tab-bar button {
-  background: none; border: none; color: var(--text2);
-  font-family: 'DM Sans', sans-serif; font-size: 0.82em;
-  padding: 6px 14px; border-radius: 6px 6px 0 0; cursor: pointer;
-  transition: all 0.2s;
-}
-.tab-bar button.active {
-  color: var(--accent); background: var(--glow);
-  border-bottom: 2px solid var(--accent);
-}
-.tab-bar button:hover { color: var(--text); }
-.tab-content { display: none; }
-.tab-content.active { display: block; }
-
-.preset-bar {
-  display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap;
-}
-.preset-bar button {
-  background: var(--surface2); border: 1px solid var(--border);
-  color: var(--text2); padding: 5px 12px; border-radius: 6px;
-  font-size: 0.75em; cursor: pointer; transition: all 0.2s;
-  font-family: 'DM Sans', sans-serif;
-}
-.preset-bar button:hover, .preset-bar button.active {
-  border-color: var(--accent); color: var(--accent);
-  background: var(--glow);
-}
-
-.footer {
-  text-align: center; padding: 30px 20px; margin-top: 30px;
-  border-top: 1px solid var(--border);
-  color: var(--text2); font-size: 0.75em;
-}
-.footer a { color: var(--accent); text-decoration: none; }
+:root{--bg:#0a0e17;--surface:#111827;--surface2:#1a2235;--border:#2a3550;--text:#e2e8f0;--text2:#94a3b8;--accent:#38bdf8;--accent2:#818cf8;--green:#4ade80;--red:#f87171;--gold:#fbbf24;--glow:rgba(56,189,248,.08)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+html{scroll-behavior:smooth}
+.container{max-width:1200px;margin:0 auto;padding:20px}
+.institute-bar{background:linear-gradient(135deg,#0f172a,#1e293b);border-bottom:1px solid var(--border);padding:12px 20px;text-align:center}
+.institute-bar .inst-name{font-family:'DM Serif Display',serif;font-size:1.1em;color:var(--text);letter-spacing:1px}
+.institute-bar .inst-sub{font-size:.72em;color:var(--text2);margin-top:2px}
+header{text-align:center;padding:30px 20px 20px;border-bottom:1px solid var(--border);margin-bottom:24px}
+header h1{font-family:'DM Serif Display',serif;font-size:2.1em;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+header p{color:var(--text2);font-size:.92em;max-width:700px;margin:0 auto}
+header .subtitle{font-size:.78em;color:var(--text2);opacity:.6;margin-top:4px}
+header .desc-btn{display:inline-block;margin-top:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;padding:8px 22px;border-radius:8px;font-size:.85em;font-weight:600;text-decoration:none;transition:transform .2s,box-shadow .2s}
+header .desc-btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(56,189,248,.3)}
+.grid{display:grid;grid-template-columns:340px 1fr;gap:24px}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;position:relative}
+.panel h2{font-family:'DM Serif Display',serif;font-size:1.12em;color:var(--accent);margin-bottom:14px;display:flex;align-items:center;gap:8px;cursor:help;position:relative}
+.panel h2 .icon{font-size:1.2em}
+.panel h2 .info-dot{width:18px;height:18px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);font-size:.65em;display:flex;align-items:center;justify-content:center;color:var(--text2);margin-left:auto;flex-shrink:0;transition:all .2s}
+.panel h2:hover .info-dot{background:var(--accent);color:#fff;border-color:var(--accent)}
+.tooltip-box{display:none;position:absolute;top:48px;left:0;right:0;z-index:100;background:#1e293b;border:1px solid var(--accent);border-radius:10px;padding:14px 16px;font-family:'DM Sans',sans-serif;font-size:.82em;font-weight:400;color:var(--text);line-height:1.5;box-shadow:0 8px 32px rgba(0,0,0,.5)}
+.tooltip-box::before{content:'';position:absolute;top:-6px;left:24px;width:12px;height:12px;background:#1e293b;border-left:1px solid var(--accent);border-top:1px solid var(--accent);transform:rotate(45deg)}
+.panel h2:hover~.tooltip-box{display:block}
+.input-group{margin-bottom:14px}
+.input-group label{display:block;font-size:.76em;font-weight:500;color:var(--text2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+.input-group input,.input-group select{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.88em;transition:border-color .2s}
+.input-group input:focus,.input-group select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--glow)}
+.input-group .hint{font-size:.68em;color:var(--text2);opacity:.6;margin-top:3px}
+.slider-group{margin-bottom:14px}
+.slider-group label{display:flex;justify-content:space-between;align-items:center;font-size:.76em;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.slider-group label span{font-family:'JetBrains Mono',monospace;color:var(--accent);font-size:1.1em}
+input[type="range"]{width:100%;height:6px;-webkit-appearance:none;appearance:none;background:var(--surface2);border-radius:3px;outline:none}
+input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;background:var(--accent);border-radius:50%;cursor:pointer;box-shadow:0 0 8px rgba(56,189,248,.4)}
+.results-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:600px){.results-grid{grid-template-columns:1fr}}
+.result-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;transition:transform .2s,box-shadow .2s}
+.result-card:hover{transform:translateY(-2px);box-shadow:0 4px 20px rgba(0,0,0,.3)}
+.result-card .label{font-size:.7em;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);margin-bottom:3px}
+.result-card .value{font-family:'JetBrains Mono',monospace;font-size:1.45em;font-weight:700}
+.result-card .detail{font-size:.73em;color:var(--text2);margin-top:3px}
+.result-card.positive .value{color:var(--green)}.result-card.negative .value{color:var(--red)}.result-card.neutral .value{color:var(--accent)}.result-card.gold .value{color:var(--gold)}.result-card.full-width{grid-column:1/-1}
+.comparison-bar{height:28px;border-radius:6px;overflow:hidden;display:flex;margin:8px 0;background:var(--surface)}
+.comparison-bar .segment{display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:.7em;font-weight:600;color:#fff;transition:width .5s ease}
+.section-divider{border:none;border-top:1px solid var(--border);margin:18px 0}
+.cascade-viz{display:flex;align-items:center;gap:2px;margin:10px 0;flex-wrap:wrap}
+.cascade-step{height:24px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:.6em;color:#fff;font-weight:600;transition:width .4s ease}
+.cascade-arrow{color:var(--text2);font-size:.7em}
+.preset-bar{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+.preset-bar button{background:var(--surface2);border:1px solid var(--border);color:var(--text2);padding:5px 12px;border-radius:6px;font-size:.75em;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif}
+.preset-bar button:hover,.preset-bar button.active{border-color:var(--accent);color:var(--accent);background:var(--glow)}
+.desc-section{max-width:900px;margin:50px auto 30px;padding:0 20px}
+.desc-section h2{font-family:'DM Serif Display',serif;font-size:1.8em;color:var(--accent);margin-bottom:24px;padding-bottom:12px;border-bottom:2px solid var(--border)}
+.desc-section h3{font-family:'DM Serif Display',serif;font-size:1.15em;color:var(--text);margin:28px 0 10px}
+.desc-section p{color:var(--text2);font-size:.92em;margin-bottom:12px;line-height:1.7}
+.desc-section ul,.desc-section ol{color:var(--text2);font-size:.9em;margin:8px 0 16px 20px;line-height:1.7}
+.desc-section li{margin-bottom:6px}
+.desc-section code{font-family:'JetBrains Mono',monospace;background:var(--surface2);padding:2px 6px;border-radius:4px;font-size:.88em;color:var(--accent)}
+.formula-block{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin:14px 0;font-family:'JetBrains Mono',monospace;font-size:.85em;color:var(--accent);line-height:1.8;overflow-x:auto}
+.note-box{background:rgba(56,189,248,.05);border-left:3px solid var(--accent);padding:12px 16px;border-radius:0 8px 8px 0;margin:14px 0;font-size:.85em;color:var(--text2)}
+.back-to-top{display:inline-block;margin-top:20px;background:var(--surface2);border:1px solid var(--border);color:var(--accent);padding:8px 18px;border-radius:8px;font-size:.82em;text-decoration:none;transition:all .2s}
+.back-to-top:hover{background:var(--glow);border-color:var(--accent)}
+.footer{text-align:center;padding:30px 20px;margin-top:30px;border-top:1px solid var(--border);color:var(--text2);font-size:.75em}
+.footer a{color:var(--accent);text-decoration:none}
 </style>
 </head>
 <body>
 
-<header>
+<div class="institute-bar">
+  <div class="inst-name">Institute of Integrative and Interdisciplinary Research</div>
+  <div class="inst-sub">Toronto, Canada &nbsp;·&nbsp; interdisciplinary-institute.org</div>
+</div>
+
+<header id="top">
   <h1>AUTT-UBI Fiscal Calculator</h1>
   <p>Interactive model for the Adaptive Universal Transaction Tax and Request-Based Universal Basic Income system</p>
-  <div class="subtitle">Based on Kriger (2026) — Formal Model with Feedback Control</div>
+  <div class="subtitle">Based on Kriger, B. (2026) — Formal Model with Feedback Control</div>
+  <br>
+  <a href="#detailed-description" class="desc-btn">📖 Detailed Description</a>
 </header>
 
 <div class="container">
-  <div class="preset-bar" id="presets">
-    <button onclick="loadPreset('us')" class="active">🇺🇸 United States</button>
-    <button onclick="loadPreset('uk')">🇬🇧 United Kingdom</button>
-    <button onclick="loadPreset('de')">🇩🇪 Germany</button>
-    <button onclick="loadPreset('fr')">🇫🇷 France</button>
-    <button onclick="loadPreset('ca')">🇨🇦 Canada</button>
-    <button onclick="loadPreset('jp')">🇯🇵 Japan</button>
-    <button onclick="loadPreset('custom')">⚙️ Custom</button>
+  <div class="preset-bar">
+    <button onclick="loadPreset('us',this)" class="active">🇺🇸 United States</button>
+    <button onclick="loadPreset('uk',this)">🇬🇧 United Kingdom</button>
+    <button onclick="loadPreset('de',this)">🇩🇪 Germany</button>
+    <button onclick="loadPreset('fr',this)">🇫🇷 France</button>
+    <button onclick="loadPreset('ca',this)">🇨🇦 Canada</button>
+    <button onclick="loadPreset('jp',this)">🇯🇵 Japan</button>
+    <button onclick="loadPreset('custom',this)">⚙️ Custom</button>
   </div>
 
   <div class="grid">
-    <!-- LEFT: INPUTS -->
     <div>
+
       <div class="panel">
-        <h2><span class="icon">🏛️</span> Country Parameters</h2>
-        <div class="input-group">
-          <label>GDP (trillions, local currency)</label>
-          <input type="number" id="gdp" value="28.8" step="0.1" oninput="calc()">
-        </div>
-        <div class="input-group">
-          <label>Government Budget (trillions)</label>
-          <input type="number" id="budget" value="6.1" step="0.1" oninput="calc()">
-        </div>
-        <div class="input-group">
-          <label>Taxable Transaction Volume V_T (trillions)</label>
-          <input type="number" id="vt" value="450" step="10" oninput="calc()">
-          <div class="hint">After financial-sector exemptions (φ ≈ 0.75–0.85)</div>
-        </div>
-        <div class="input-group">
-          <label>Population (millions)</label>
-          <input type="number" id="pop" value="335" step="1" oninput="calc()">
-        </div>
-        <div class="input-group">
-          <label>Currency</label>
-          <select id="currency" onchange="calc()">
-            <option value="$">$ (USD/CAD/AUD)</option>
-            <option value="£">£ (GBP)</option>
-            <option value="€">€ (EUR)</option>
-            <option value="¥">¥ (JPY)</option>
-          </select>
-        </div>
+        <h2><span class="icon">🏛️</span> Country Parameters <span class="info-dot">?</span></h2>
+        <div class="tooltip-box">These are the basic economic numbers for a country: how big the economy is (GDP), how much the government spends each year (budget), and how much money moves through the banking system (transaction volume). The calculator uses these to figure out what tax rate would be needed.</div>
+        <div class="input-group"><label>GDP (trillions, local currency)</label><input type="number" id="gdp" value="28.8" step="0.1" oninput="calc()"></div>
+        <div class="input-group"><label>Government Budget (trillions)</label><input type="number" id="budget" value="6.1" step="0.1" oninput="calc()"></div>
+        <div class="input-group"><label>Taxable Transaction Volume V_T (trillions)</label><input type="number" id="vt" value="450" step="10" oninput="calc()"><div class="hint">After financial-sector exemptions (φ ≈ 0.75–0.85)</div></div>
+        <div class="input-group"><label>Population (millions)</label><input type="number" id="pop" value="335" step="1" oninput="calc()"></div>
+        <div class="input-group"><label>Currency</label><select id="currency" onchange="calc()"><option value="$">$ (USD/CAD/AUD)</option><option value="£">£ (GBP)</option><option value="€">€ (EUR)</option><option value="¥">¥ (JPY)</option></select></div>
       </div>
 
-      <div class="panel" style="margin-top: 16px;">
-        <h2><span class="icon">🎛️</span> Model Parameters</h2>
-        <div class="slider-group">
-          <label>Cascade multiplier (m) <span id="mVal">3</span></label>
-          <input type="range" id="cascade" min="1" max="10" step="0.5" value="3" oninput="calc()">
-        </div>
-        <div class="slider-group">
-          <label>UBI take-up rate <span id="takeupVal">45%</span></label>
-          <input type="range" id="takeup" min="10" max="100" step="5" value="45" oninput="calc()">
-        </div>
-        <div class="slider-group">
-          <label>Annual UBI per adult <span id="ubiVal">$24,000</span></label>
-          <input type="range" id="ubi_amount" min="6000" max="48000" step="1000" value="24000" oninput="calc()">
-        </div>
-        <div class="slider-group">
-          <label>τ_max ceiling <span id="tmaxVal">2.0%</span></label>
-          <input type="range" id="tmax" min="0.5" max="5" step="0.1" value="2" oninput="calc()">
-        </div>
-        <div class="slider-group">
-          <label>Elasticity (ε) <span id="epsVal">5.0</span></label>
-          <input type="range" id="epsilon" min="0.5" max="20" step="0.5" value="5" oninput="calc()">
-        </div>
+      <div class="panel" style="margin-top:16px">
+        <h2><span class="icon">🎛️</span> Model Parameters <span class="info-dot">?</span></h2>
+        <div class="tooltip-box">These control how the tax system behaves. The cascade multiplier is how many times money changes hands in a supply chain before reaching you. The take-up rate is what percentage of people actually request the basic income. The elasticity measures how sensitively people react to the tax rate. Play with these to see how robust the results are.</div>
+        <div class="slider-group"><label>Cascade multiplier (m) <span id="mVal">3</span></label><input type="range" id="cascade" min="1" max="10" step="0.5" value="3" oninput="calc()"></div>
+        <div class="slider-group"><label>UBI take-up rate <span id="takeupVal">45%</span></label><input type="range" id="takeup" min="10" max="100" step="5" value="45" oninput="calc()"></div>
+        <div class="slider-group"><label>Annual UBI per adult <span id="ubiVal">$24,000</span></label><input type="range" id="ubi_amount" min="6000" max="48000" step="1000" value="24000" oninput="calc()"></div>
+        <div class="slider-group"><label>τ_max ceiling <span id="tmaxVal">2.0%</span></label><input type="range" id="tmax" min="0.5" max="5" step="0.1" value="2" oninput="calc()"></div>
+        <div class="slider-group"><label>Elasticity (ε) <span id="epsVal">5.0</span></label><input type="range" id="epsilon" min="0.5" max="20" step="0.5" value="5" oninput="calc()"></div>
       </div>
 
-      <div class="panel" style="margin-top: 16px;">
-        <h2><span class="icon">👤</span> Household Calculator</h2>
-        <div class="input-group">
-          <label>Household annual income</label>
-          <input type="number" id="hh_income" value="80000" step="1000" oninput="calc()">
-        </div>
-        <div class="slider-group">
-          <label>Consumption rate <span id="consVal">75%</span></label>
-          <input type="range" id="hh_cons" min="20" max="100" step="5" value="75" oninput="calc()">
-        </div>
-        <div class="slider-group">
-          <label>Current effective tax rate <span id="curtaxVal">26%</span></label>
-          <input type="range" id="hh_curtax" min="5" max="50" step="1" value="26" oninput="calc()">
-        </div>
-        <div class="input-group">
-          <label>Claims UBI?</label>
-          <select id="hh_ubi" onchange="calc()">
-            <option value="0">No</option>
-            <option value="1" selected>Yes (1 adult)</option>
-            <option value="2">Yes (2 adults)</option>
-          </select>
-        </div>
+      <div class="panel" style="margin-top:16px">
+        <h2><span class="icon">👤</span> Household Calculator <span class="info-dot">?</span></h2>
+        <div class="tooltip-box">This is personal — enter your own household income to see what changes for you. How much do you currently pay in all taxes combined? How much would you pay under AUTT? How much more money would you keep? You can also choose whether you'd claim the basic income.</div>
+        <div class="input-group"><label>Household annual income</label><input type="number" id="hh_income" value="80000" step="1000" oninput="calc()"></div>
+        <div class="slider-group"><label>Consumption rate <span id="consVal">75%</span></label><input type="range" id="hh_cons" min="20" max="100" step="5" value="75" oninput="calc()"></div>
+        <div class="slider-group"><label>Current effective tax rate <span id="curtaxVal">26%</span></label><input type="range" id="hh_curtax" min="5" max="50" step="1" value="26" oninput="calc()"></div>
+        <div class="input-group"><label>Claims UBI?</label><select id="hh_ubi" onchange="calc()"><option value="0">No</option><option value="1" selected>Yes (1 adult)</option><option value="2">Yes (2 adults)</option></select></div>
       </div>
     </div>
 
-    <!-- RIGHT: RESULTS -->
     <div>
+
       <div class="panel">
-        <h2><span class="icon">📊</span> AUTT Core Results</h2>
+        <h2><span class="icon">📊</span> AUTT Core Results <span class="info-dot">?</span></h2>
+        <div class="tooltip-box">The key numbers. The "required rate" is the tiny percentage skimmed from every electronic transaction to fund the entire government. The "cascade burden" shows the total effect after money passes through several hands in a supply chain. The "stability" indicator tells you if the system is self-sustaining — green means yes, red means the tax rate is too high and people would start avoiding transactions.</div>
         <div class="results-grid">
-          <div class="result-card neutral">
-            <div class="label">Required AUTT Rate (τ)</div>
-            <div class="value" id="r_tau">—</div>
-            <div class="detail" id="r_tau_detail"></div>
-          </div>
-          <div class="result-card" id="r_cascade_card">
-            <div class="label">Effective Cascade Burden</div>
-            <div class="value" id="r_cascade">—</div>
-            <div class="detail" id="r_cascade_detail"></div>
-          </div>
-          <div class="result-card gold">
-            <div class="label">V / GDP Ratio</div>
-            <div class="value" id="r_vgdp">—</div>
-            <div class="detail">Transaction intensity of economy</div>
-          </div>
-          <div class="result-card" id="r_stable_card">
-            <div class="label">Spiral Stability (ε·τ*)</div>
-            <div class="value" id="r_stable">—</div>
-            <div class="detail" id="r_stable_detail"></div>
-          </div>
+          <div class="result-card neutral"><div class="label">Required AUTT Rate (τ)</div><div class="value" id="r_tau">—</div><div class="detail" id="r_tau_detail"></div></div>
+          <div class="result-card" id="r_cascade_card"><div class="label">Effective Cascade Burden</div><div class="value" id="r_cascade">—</div><div class="detail" id="r_cascade_detail"></div></div>
+          <div class="result-card gold"><div class="label">V / GDP Ratio</div><div class="value" id="r_vgdp">—</div><div class="detail">Transaction intensity of economy</div></div>
+          <div class="result-card" id="r_stable_card"><div class="label">Spiral Stability (ε·τ*)</div><div class="value" id="r_stable">—</div><div class="detail" id="r_stable_detail"></div></div>
         </div>
       </div>
 
-      <div class="panel" style="margin-top: 16px;">
-        <h2><span class="icon">💰</span> UBI Fiscal Impact</h2>
+      <div class="panel" style="margin-top:16px">
+        <h2><span class="icon">💰</span> UBI Fiscal Impact <span class="info-dot">?</span></h2>
+        <div class="tooltip-box">How much does the Universal Basic Income actually cost? Not everyone will claim it — people with good jobs often don't bother. The "take-up rate" controls this. The "capacity" shows the maximum the system could ever collect, and the "surplus" tells you whether there's money left over after paying for everything.</div>
         <div class="results-grid">
-          <div class="result-card neutral">
-            <div class="label">Max UBI Cost (100% take-up)</div>
-            <div class="value" id="r_ubi_max">—</div>
-          </div>
-          <div class="result-card positive">
-            <div class="label">Projected UBI Cost (request-based)</div>
-            <div class="value" id="r_ubi_actual">—</div>
-            <div class="detail" id="r_ubi_detail"></div>
-          </div>
-          <div class="result-card neutral">
-            <div class="label">τ_max Revenue Capacity</div>
-            <div class="value" id="r_maxrev">—</div>
-          </div>
-          <div class="result-card" id="r_surplus_card">
-            <div class="label">Fiscal Surplus / Deficit at τ_max</div>
-            <div class="value" id="r_surplus">—</div>
-          </div>
+          <div class="result-card neutral"><div class="label">Max UBI Cost (100% take-up)</div><div class="value" id="r_ubi_max">—</div></div>
+          <div class="result-card positive"><div class="label">Projected UBI Cost (request-based)</div><div class="value" id="r_ubi_actual">—</div><div class="detail" id="r_ubi_detail"></div></div>
+          <div class="result-card neutral"><div class="label">τ_max Revenue Capacity</div><div class="value" id="r_maxrev">—</div></div>
+          <div class="result-card" id="r_surplus_card"><div class="label">Fiscal Surplus / Deficit at τ_max</div><div class="value" id="r_surplus">—</div></div>
         </div>
       </div>
 
-      <div class="panel" style="margin-top: 16px;">
-        <h2><span class="icon">🏠</span> Household Comparison</h2>
+      <div class="panel" style="margin-top:16px">
+        <h2><span class="icon">🏠</span> Household Comparison <span class="info-dot">?</span></h2>
+        <div class="tooltip-box">The bottom line for a real family. It compares how much you pay today in all taxes combined (income tax, sales tax, payroll tax, property tax…) versus what you'd effectively pay under AUTT — just a tiny invisible fee baked into prices. The "Capital Liberation" shows how much extra money stays in your pocket every year.</div>
         <div class="results-grid">
-          <div class="result-card negative">
-            <div class="label">Current System — Total Tax</div>
-            <div class="value" id="r_hh_curtax">—</div>
-            <div class="detail" id="r_hh_curtax_d"></div>
-          </div>
-          <div class="result-card positive">
-            <div class="label">AUTT System — Effective Burden</div>
-            <div class="value" id="r_hh_autt">—</div>
-            <div class="detail" id="r_hh_autt_d"></div>
-          </div>
-          <div class="result-card negative">
-            <div class="label">Current Disposable Income</div>
-            <div class="value" id="r_hh_disp_cur">—</div>
-          </div>
-          <div class="result-card positive">
-            <div class="label">AUTT Disposable Income</div>
-            <div class="value" id="r_hh_disp_autt">—</div>
-          </div>
-          <div class="result-card positive full-width">
-            <div class="label">Capital Liberation (Annual Gain)</div>
-            <div class="value" id="r_hh_gain">—</div>
-            <div class="detail" id="r_hh_gain_d"></div>
-          </div>
+          <div class="result-card negative"><div class="label">Current System — Total Tax</div><div class="value" id="r_hh_curtax">—</div><div class="detail" id="r_hh_curtax_d"></div></div>
+          <div class="result-card positive"><div class="label">AUTT System — Effective Burden</div><div class="value" id="r_hh_autt">—</div><div class="detail" id="r_hh_autt_d"></div></div>
+          <div class="result-card negative"><div class="label">Current Disposable Income</div><div class="value" id="r_hh_disp_cur">—</div></div>
+          <div class="result-card positive"><div class="label">AUTT Disposable Income</div><div class="value" id="r_hh_disp_autt">—</div></div>
+          <div class="result-card positive full-width"><div class="label">Capital Liberation (Annual Gain)</div><div class="value" id="r_hh_gain">—</div><div class="detail" id="r_hh_gain_d"></div></div>
         </div>
-
         <hr class="section-divider">
-        <div class="label" style="font-size:0.72em;text-transform:uppercase;letter-spacing:0.5px;color:var(--text2);margin-bottom:8px;">Tax Burden Comparison</div>
+        <div style="font-size:.7em;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);margin-bottom:8px">Tax Burden Comparison</div>
         <div class="comparison-bar">
-          <div class="segment" id="bar_curtax" style="background:#ef4444;"></div>
-          <div class="segment" id="bar_autt" style="background:#22c55e;"></div>
-          <div class="segment" id="bar_saved" style="background:var(--surface2); color:var(--text2);"></div>
+          <div class="segment" id="bar_curtax" style="background:#ef4444"></div>
+          <div class="segment" id="bar_autt" style="background:#22c55e"></div>
+          <div class="segment" id="bar_saved" style="background:var(--surface2);color:var(--text2)"></div>
         </div>
-        <div style="display:flex;justify-content:space-between;font-size:0.7em;color:var(--text2);">
-          <span>🔴 Current tax</span><span>🟢 AUTT cascade</span><span>⬜ Liberated</span>
+        <div style="display:flex;justify-content:space-between;font-size:.68em;color:var(--text2)"><span>🔴 Current tax</span><span>🟢 AUTT cascade</span><span>⬜ Liberated</span></div>
+      </div>
+
+      <div class="panel" style="margin-top:16px">
+        <h2><span class="icon">🔗</span> Cascade Visualization <span class="info-dot">?</span></h2>
+        <div class="tooltip-box">Imagine $10,000 being spent, then re-spent, then re-spent again through the economy. At each step, a tiny fraction goes to the government. This shows how much is left after each transaction, and the cumulative extraction after many transactions. Even at 0.5% per step, after 200 hands the government has collected about 63% — without anyone ever paying more than half a cent per dollar.</div>
+        <div style="font-size:.78em;color:var(--text2);margin-bottom:10px">$10,000 passing through successive transactions — government extraction at each step</div>
+        <div class="cascade-viz" id="cascade_viz"></div>
+        <div class="results-grid" style="margin-top:12px">
+          <div class="result-card neutral"><div class="label">After 10 transactions</div><div class="value" id="r_c10">—</div></div>
+          <div class="result-card neutral"><div class="label">After 50 transactions</div><div class="value" id="r_c50">—</div></div>
+          <div class="result-card neutral"><div class="label">After 100 transactions</div><div class="value" id="r_c100">—</div></div>
+          <div class="result-card neutral"><div class="label">After 200 transactions</div><div class="value" id="r_c200">—</div></div>
         </div>
       </div>
 
-      <div class="panel" style="margin-top: 16px;">
-        <h2><span class="icon">🔗</span> Cascade Visualization</h2>
-        <div style="font-size:0.8em;color:var(--text2);margin-bottom:10px;">
-          Money passing through successive transactions — government extraction at each step
-        </div>
-        <div class="cascade-viz" id="cascade_viz"></div>
-        <div class="results-grid" style="margin-top:12px;">
-          <div class="result-card neutral">
-            <div class="label">After 10 transactions</div>
-            <div class="value" id="r_c10">—</div>
-          </div>
-          <div class="result-card neutral">
-            <div class="label">After 50 transactions</div>
-            <div class="value" id="r_c50">—</div>
-          </div>
-          <div class="result-card neutral">
-            <div class="label">After 100 transactions</div>
-            <div class="value" id="r_c100">—</div>
-          </div>
-          <div class="result-card neutral">
-            <div class="label">After 200 transactions</div>
-            <div class="value" id="r_c200">—</div>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </div>
 
+<!-- ===== DETAILED DESCRIPTION ===== -->
+<div class="desc-section" id="detailed-description">
+  <h2>📖 Detailed Description</h2>
+  <p>This interactive calculator is the computational companion to the academic paper:</p>
+  <p style="color:var(--text);font-style:italic">Kriger, B. (2026). "Adaptive Universal Transaction Tax and Request-Based Universal Basic Income as a Coupled Response to Automation-Driven Labour Displacement: A Formal Model with Feedback Control." Institute of Integrative and Interdisciplinary Research, Toronto.</p>
+  <div class="note-box">All formulas implemented in this calculator correspond directly to definitions, propositions, and theorems in the paper. Every result updates instantly as you adjust any input.</div>
+
+  <h3>What is the AUTT?</h3>
+  <p>The Adaptive Universal Transaction Tax is a proposal to replace <em>all</em> existing taxes — income tax, corporate tax, capital gains tax, payroll tax, sales tax, and VAT — with a single, tiny, automatically collected levy on every electronic financial transaction. The rate is typically between 0.3% and 1.5%, and it adjusts in real time to meet the government's budget target.</p>
+  <p>The key insight: vastly more money moves through the banking system than any country's GDP. In the United States, approximately $450 trillion passes through electronic payment systems each year — about 16 times GDP. A tiny fraction of this flow is more than enough to fund the entire government. No one fills out a tax return. No one gets audited. No corporation hires an accountant to minimise its tax bill. The levy is collected automatically by the bank at the moment of the transaction — invisible, unavoidable, and negligibly small.</p>
+
+  <h3>What is Request-Based UBI?</h3>
+  <p>The Universal Basic Income is a regular cash payment to every adult resident — no conditions, no means test, no bureaucratic application. "Request-based" means you simply ask for it; you don't have to prove anything. But because many people with adequate income won't bother to claim it, the actual cost is much lower than the theoretical maximum. Canada's CERB programme in 2020 showed this: 8.9 million out of 20+ million eligible people claimed it — a take-up of about 45%.</p>
+  <p>The UBI is not charity; it is the dividend of a modern economy's transactional intensity, distributed to all its participants. Combined with the AUTT, it creates a system that is mathematically more progressive than any existing tax-and-transfer system: the lowest income decile receives net transfers exceeding 159% of their income, while the highest decile pays less than 0.4% of theirs.</p>
+
+  <h3>Country Presets</h3>
+  <p>The calculator provides one-click presets for six economies, calibrated from BIS payment statistics, IMF fiscal data, and national accounts:</p>
+  <ul>
+    <li><strong>🇺🇸 United States:</strong> GDP $28.8T, Budget $6.1T, V<sub>T</sub> $450T → required τ ≈ 1.36%</li>
+    <li><strong>🇬🇧 United Kingdom:</strong> GDP £3.5T, Budget £1.2T, V<sub>T</sub> £60T → required τ ≈ 2.00%</li>
+    <li><strong>🇩🇪 Germany:</strong> GDP €4.5T, Budget €1.9T, V<sub>T</sub> €80T → required τ ≈ 2.38%</li>
+    <li><strong>🇫🇷 France:</strong> GDP €3.1T, Budget €1.6T, V<sub>T</sub> €55T → required τ ≈ 2.91%</li>
+    <li><strong>🇨🇦 Canada:</strong> GDP $2.1T, Budget $0.9T, V<sub>T</sub> $120T → required τ ≈ 0.75%</li>
+    <li><strong>🇯🇵 Japan:</strong> GDP ¥4.2T, Budget ¥1.8T, V<sub>T</sub> ¥250T → required τ ≈ 0.72%</li>
+  </ul>
+
+  <h3>Input Parameters Explained</h3>
+  <p><strong>GDP</strong> — Gross Domestic Product, the total value of goods and services produced in a year. The traditional measure of economic size — but transaction volume is much larger, because every dollar of GDP passes through multiple hands.</p>
+  <p><strong>Government Budget (B)</strong> — How much the government needs to collect each year to fund all services: defence, healthcare, education, infrastructure, pensions, and the UBI.</p>
+  <p><strong>Taxable Transaction Volume (V<sub>T</sub>)</strong> — The total value of electronic transactions subject to the AUTT, <em>after</em> exempting financial-sector plumbing (interbank transfers, derivatives, repo markets, exchange-based trading). Typically 15–25% of gross transaction volume, but still 10–20 times GDP.</p>
+  <p><strong>Cascade Multiplier (m)</strong> — When you buy a loaf of bread, the money doesn't stay at the shop. The shop pays the baker, the baker pays the flour mill, the mill pays the farmer, the farmer pays the seed company. Each transaction is taxed. The cascade multiplier captures how many hands the money passes through on average. Values: 2–3 for simple goods (groceries, rent), 4–6 for manufactured goods, 7–10 for complex electronics or luxury goods.</p>
+  <p><strong>UBI Take-up Rate</strong> — What fraction of eligible adults actually claim the basic income. Not everyone will: people with well-paying jobs, retirees with adequate pensions, and those who simply don't bother. The Canadian CERB precedent suggests 35–45%.</p>
+  <p><strong>Annual UBI per Adult</strong> — The yearly payment to each claimant. $24,000/year ($2,000/month) is roughly the US poverty line — enough for food, shelter, and basic needs, but not luxury. This preserves the incentive to work for a better standard of living.</p>
+  <p><strong>τ<sub>max</sub> Ceiling</strong> — A constitutionally enshrined maximum rate the AUTT can never exceed, changeable only by supermajority. This hard ceiling prevents governments from ratcheting up the rate and is published in real time — visible to every citizen.</p>
+  <p><strong>Elasticity (ε)</strong> — How much transaction volume drops when the tax rate rises. At ε=5, a 1% rate reduces volume by 5%. Empirical evidence from existing transaction taxes (UK Stamp Duty since 1986, French FTT since 2012) suggests real-economy elasticities of 1–5.</p>
+  <p><strong>Consumption Rate</strong> — The fraction of household income spent on goods and services (as opposed to saved or invested). Lower-income households spend nearly all their income (90–95%); wealthier households save more (consumption rate 25–50%). This is why the AUTT alone would be slightly regressive — but the UBI more than compensates.</p>
+  <p><strong>Current Effective Tax Rate</strong> — Your total tax burden across all taxes: federal income tax, state/provincial income tax, payroll tax, sales/VAT tax, property tax, and excise duties. For the US middle class, the Institute on Taxation and Economic Policy estimates this at approximately 26% (2024).</p>
+
+  <h3>Output Panels Explained</h3>
+  <p><strong>Required AUTT Rate (τ)</strong> — Simply the budget divided by the transaction volume. If the government needs $6.1T and $450T flows through the system, the rate is 1.36%.</p>
+  <div class="formula-block">τ = B / V<sub>T</sub></div>
+
+  <p><strong>Effective Cascade Burden</strong> — The actual tax embedded in the final price of goods, after money has passed through m intermediaries. At τ=1.36% and m=3, the effective burden is 4.1% — far below any country's VAT rate (10–25%), and far below the combined current tax burden (25–40%).</p>
+  <div class="formula-block">τ<sub>eff</sub> = τ × m</div>
+
+  <p><strong>V/GDP Ratio</strong> — How many times the transaction volume exceeds GDP. Higher ratios mean the tax base is larger relative to the economy, allowing lower rates.</p>
+
+  <p><strong>Spiral Stability (ε·τ*)</strong> — The critical safety check. If the tax causes people to significantly reduce transactions, revenue falls, forcing the rate higher, causing more avoidance — a potential "death spiral." The product ε·τ* must be below 1 for stability. At operational rates, it's typically 0.01–0.10: nowhere near danger.</p>
+  <div class="formula-block">Stability: ε · τ* &lt; 1 ✓ stable &nbsp;&nbsp;|&nbsp;&nbsp; ε · τ* ≥ 1 ⚠ unstable</div>
+
+  <p><strong>UBI Fiscal Impact</strong> — Maximum cost (if every adult claims) vs. projected actual cost at the specified take-up rate. The surplus/deficit shows whether the system is sustainable.</p>
+
+  <p><strong>Household Comparison</strong> — The most personally relevant output. It compares your current total tax burden against what you'd effectively pay under AUTT — typically a reduction from ~26% to ~1–3% of income.</p>
+  <div class="formula-block">Current tax = income × effective_tax_rate<br>AUTT burden = income × consumption_rate × τ × m<br>Capital liberation = (current_tax − AUTT_burden) + UBI_received</div>
+
+  <p><strong>Cascade Visualization</strong> — A demonstration of cumulative extraction. The government never takes more than τ from any single transaction, but as the same money circulates, the cumulative effect grows:</p>
+  <div class="formula-block">Cumulative extraction after n transactions = 1 − (1 − τ)<sup>n</sup></div>
+
+  <h3>Key Insight: Why This Works</h3>
+  <p>Traditional taxation tries to measure each person's and each company's income — a task requiring enormous bureaucracy, invasive reporting, and endless opportunities for avoidance. The wealthiest 0.1% often pay lower effective rates than the middle class, because entity-based taxation can always be gamed by those who can afford lawyers and offshore structures.</p>
+  <p>The AUTT sidesteps this entirely by taxing the <em>flow of money through the banking system</em>, which is: (a) automatically measurable, (b) impossible to avoid without leaving the banking system, and (c) vastly larger than income alone. The obligation falls on ~1,000 licensed financial institutions — not on 100 million taxpayers.</p>
+  <p>The result for a median US household earning $80,000: current taxes take ~$20,800 (26%); AUTT cascade costs ~$2,000 (invisible, embedded in prices). The difference — approximately $18,600 per year — is liberated capital. Add UBI of $24,000, and total household resources rise from $59,200 to $102,000: a 72% increase.</p>
+  <p>Across 67 million middle-class US households, aggregate capital liberation is approximately <strong>$1.17 trillion per year</strong> — a massive economic stimulus that generates additional transactions, additional AUTT revenue, and enables even lower rates in a virtuous cycle.</p>
+
+  <h3>Limitations</h3>
+  <ul>
+    <li>Transaction volume estimates are based on aggregate payment statistics and may over- or undercount. Phase 1 calibration (one year at 0.1% alongside existing taxes) resolves this empirically.</li>
+    <li>The cascade multiplier is treated as uniform across goods; in reality, different products have different supply chain lengths.</li>
+    <li>General equilibrium effects (changes in labour supply, savings, firm structure, international capital flows) are modelled in the paper's stylised GE framework but not fully captured in a simple calculator.</li>
+    <li>Property tax may be preserved at the municipal level; the household comparison assumes full replacement for simplicity.</li>
+    <li>Migration, remittance, and international trade effects are discussed in the paper but not modelled here.</li>
+  </ul>
+
+  <h3>Formulas and Cross-References to the Paper</h3>
+  <div class="formula-block">
+    τ = B / V<sub>T</sub> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Definition 3.1: Revenue Flow<br>
+    τ<sub>eff</sub> = τ × m &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Section 6: Cascade Effect<br>
+    ε · τ* &lt; 1 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Proposition 18.1: Spiral Stability<br>
+    Extraction(n) = 1 − (1−τ)<sup>n</sup> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Section 6: Cumulative Extraction<br>
+    Burden<sub>k</sub> = τ · m · c<sub>k</sub> · y<sub>k</sub> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Section 17: Distributional Incidence
+  </div>
+
+  <h3>Technical Implementation</h3>
+  <p>This calculator is a single-file HTML application with no external dependencies beyond Google Fonts. All computation runs client-side in JavaScript. It can be hosted on any static web server, downloaded and run locally, or embedded in any web page. The source code is open and may be freely modified.</p>
+
+  <h3>Citation</h3>
+  <div class="note-box" style="color:var(--text)">
+    Kriger, B. (2026). "Adaptive Universal Transaction Tax and Request-Based Universal Basic Income as a Coupled Response to Automation-Driven Labour Displacement: A Formal Model with Feedback Control." <em>Institute of Integrative and Interdisciplinary Research</em>, Toronto.<br><br>
+    Calculator: <a href="https://boriskriger.github.io/publicationsiiir/autt_calculator.html" style="color:var(--accent)">https://boriskriger.github.io/publicationsiiir/autt_calculator.html</a>
+  </div>
+  <a href="#top" class="back-to-top">↑ Back to Calculator</a>
+</div>
+
 <div class="footer">
-  <p><strong>AUTT-UBI Fiscal Calculator</strong> — Based on Kriger, B. (2026). <em>Adaptive Universal Transaction Tax and Request-Based Universal Basic Income</em>.</p>
-  <p style="margin-top:4px;">Interactive companion to the formal model. All calculations are illustrative. <a href="#">View paper on Zenodo</a></p>
+  <p><strong>Institute of Integrative and Interdisciplinary Research</strong> · Toronto, Canada</p>
+  <p style="margin-top:4px">AUTT-UBI Fiscal Calculator — Interactive companion to the formal model</p>
+  <p style="margin-top:4px"><a href="https://boriskriger.github.io/publicationsiiir/autt_calculator.html">Permanent link</a></p>
 </div>
 
 <script>
-const presets = {
-  us:  { gdp:28.8, budget:6.1, vt:450, pop:335, cur:'$', name:'United States' },
-  uk:  { gdp:3.5,  budget:1.2, vt:60,  pop:68,  cur:'£', name:'United Kingdom' },
-  de:  { gdp:4.5,  budget:1.9, vt:80,  pop:84,  cur:'€', name:'Germany' },
-  fr:  { gdp:3.1,  budget:1.6, vt:55,  pop:68,  cur:'€', name:'France' },
-  ca:  { gdp:2.1,  budget:0.9, vt:120, pop:40,  cur:'$', name:'Canada' },
-  jp:  { gdp:4.2,  budget:1.8, vt:250, pop:124, cur:'¥', name:'Japan' }
-};
-
-function loadPreset(key) {
-  document.querySelectorAll('.preset-bar button').forEach(b => b.classList.remove('active'));
-  event.target.classList.add('active');
-  if (key === 'custom') { calc(); return; }
-  const p = presets[key];
-  document.getElementById('gdp').value = p.gdp;
-  document.getElementById('budget').value = p.budget;
-  document.getElementById('vt').value = p.vt;
-  document.getElementById('pop').value = p.pop;
-  document.getElementById('currency').value = p.cur === '¥' ? '¥' : p.cur === '£' ? '£' : p.cur === '€' ? '€' : '$';
-  calc();
-}
-
-function fmt(n, decimals=1) {
-  if (Math.abs(n) >= 1e12) return (n/1e12).toFixed(decimals) + 'T';
-  if (Math.abs(n) >= 1e9) return (n/1e9).toFixed(decimals) + 'B';
-  if (Math.abs(n) >= 1e6) return (n/1e6).toFixed(decimals) + 'M';
-  if (Math.abs(n) >= 1e3) return (n/1e3).toFixed(decimals) + 'K';
-  return n.toFixed(decimals);
-}
-
-function fmtMoney(n, cur) {
-  if (Math.abs(n) >= 1e12) return cur + (n/1e12).toFixed(2) + 'T';
-  if (Math.abs(n) >= 1e9) return cur + (n/1e9).toFixed(1) + 'B';
-  if (Math.abs(n) >= 1e6) return cur + (n/1e6).toFixed(1) + 'M';
-  return cur + n.toLocaleString('en-US', {maximumFractionDigits:0});
-}
-
-function calc() {
-  const cur = document.getElementById('currency').value;
-  const gdp = parseFloat(document.getElementById('gdp').value) || 0;
-  const budget = parseFloat(document.getElementById('budget').value) || 0;
-  const vt = parseFloat(document.getElementById('vt').value) || 1;
-  const pop = parseFloat(document.getElementById('pop').value) || 1;
-  const m = parseFloat(document.getElementById('cascade').value) || 3;
-  const takeup = parseFloat(document.getElementById('takeup').value) / 100;
-  const ubiAmt = parseFloat(document.getElementById('ubi_amount').value) || 24000;
-  const tmax = parseFloat(document.getElementById('tmax').value) / 100;
-  const eps = parseFloat(document.getElementById('epsilon').value) || 5;
-
-  const hhIncome = parseFloat(document.getElementById('hh_income').value) || 80000;
-  const hhCons = parseFloat(document.getElementById('hh_cons').value) / 100;
-  const hhCurTax = parseFloat(document.getElementById('hh_curtax').value) / 100;
-  const hhUbiAdults = parseInt(document.getElementById('hh_ubi').value);
-
-  // Update slider labels
-  document.getElementById('mVal').textContent = m.toFixed(1);
-  document.getElementById('takeupVal').textContent = (takeup*100).toFixed(0) + '%';
-  document.getElementById('ubiVal').textContent = cur + ubiAmt.toLocaleString();
-  document.getElementById('tmaxVal').textContent = (tmax*100).toFixed(1) + '%';
-  document.getElementById('epsVal').textContent = eps.toFixed(1);
-  document.getElementById('consVal').textContent = (hhCons*100).toFixed(0) + '%';
-  document.getElementById('curtaxVal').textContent = (hhCurTax*100).toFixed(0) + '%';
-
-  // Core calculations
-  const tau = budget / vt; // required rate
-  const tauPct = tau * 100;
-  const cascade = tau * m;
-  const cascadePct = cascade * 100;
-  const vgdp = vt / gdp;
-  const spiralProduct = eps * tau;
-
-  // UBI
-  const adults = pop * 0.78; // ~78% adult
-  const ubiMaxCost = adults * 1e6 * ubiAmt;
-  const ubiActualCost = ubiMaxCost * takeup;
-  const tmaxRev = tmax * vt * 1e12;
-  const budgetTotal = budget * 1e12;
-  const surplus = tmaxRev - budgetTotal;
-
-  // Results
-  document.getElementById('r_tau').textContent = tauPct.toFixed(2) + '%';
-  document.getElementById('r_tau_detail').textContent = tauPct < tmax*100 ? '✓ Below τ_max ceiling' : '⚠ Exceeds τ_max!';
-
-  document.getElementById('r_cascade').textContent = cascadePct.toFixed(1) + '%';
-  const cascadeCard = document.getElementById('r_cascade_card');
-  cascadeCard.className = 'result-card ' + (cascadePct < 10 ? 'positive' : cascadePct < 20 ? 'gold' : 'negative');
-  document.getElementById('r_cascade_detail').textContent = 'at m=' + m.toFixed(1) + ' (compare: VAT 10–25%)';
-
-  document.getElementById('r_vgdp').textContent = vgdp.toFixed(1) + '×';
-
-  document.getElementById('r_stable').textContent = spiralProduct.toFixed(3);
-  const stableCard = document.getElementById('r_stable_card');
-  stableCard.className = 'result-card ' + (spiralProduct < 0.25 ? 'positive' : spiralProduct < 1 ? 'gold' : 'negative');
-  document.getElementById('r_stable_detail').textContent = spiralProduct < 1 ? '✓ Stable (< 1.0)' : '⚠ Unstable — spiral risk!';
-
-  document.getElementById('r_ubi_max').textContent = fmtMoney(ubiMaxCost, cur);
-  document.getElementById('r_ubi_actual').textContent = fmtMoney(ubiActualCost, cur);
-  document.getElementById('r_ubi_detail').textContent = 'at ' + (takeup*100).toFixed(0) + '% take-up (' + fmt(adults*takeup, 1) + 'M claimants)';
-  document.getElementById('r_maxrev').textContent = fmtMoney(tmaxRev, cur);
-  document.getElementById('r_surplus').textContent = fmtMoney(surplus, cur);
-  const surplusCard = document.getElementById('r_surplus_card');
-  surplusCard.className = 'result-card ' + (surplus >= 0 ? 'positive' : 'negative');
-
-  // Household
-  const hhCurTaxAmt = hhIncome * hhCurTax;
-  const hhAuttBurden = hhIncome * hhCons * cascade;
-  const hhDispCur = hhIncome - hhCurTaxAmt;
-  const hhUbiReceived = hhUbiAdults * ubiAmt;
-  const hhDispAutt = hhIncome - hhAuttBurden + hhUbiReceived;
-  const hhGain = hhDispAutt - hhDispCur;
-
-  document.getElementById('r_hh_curtax').textContent = fmtMoney(hhCurTaxAmt, cur);
-  document.getElementById('r_hh_curtax_d').textContent = (hhCurTax*100).toFixed(0) + '% effective rate';
-  document.getElementById('r_hh_autt').textContent = fmtMoney(hhAuttBurden, cur);
-  document.getElementById('r_hh_autt_d').textContent = (cascade*hhCons*100).toFixed(2) + '% effective on income';
-  document.getElementById('r_hh_disp_cur').textContent = fmtMoney(hhDispCur, cur);
-  document.getElementById('r_hh_disp_autt').textContent = fmtMoney(hhDispAutt, cur);
-  document.getElementById('r_hh_gain').textContent = (hhGain >= 0 ? '+' : '') + fmtMoney(hhGain, cur);
-  const gainPct = ((hhGain / hhDispCur) * 100).toFixed(0);
-  document.getElementById('r_hh_gain_d').textContent = (hhGain >= 0 ? '+' : '') + gainPct + '% change in disposable income' + (hhUbiAdults > 0 ? ' (incl. UBI)' : '');
-  document.getElementById('r_hh_gain').parentElement.className = 'result-card full-width ' + (hhGain >= 0 ? 'positive' : 'negative');
-
-  // Comparison bar
-  const totalIncome = hhIncome;
-  const curTaxPct = (hhCurTaxAmt / totalIncome * 100);
-  const auttPct = (hhAuttBurden / totalIncome * 100);
-  const savedPct = 100 - curTaxPct;
-  document.getElementById('bar_curtax').style.width = curTaxPct + '%';
-  document.getElementById('bar_curtax').textContent = curTaxPct.toFixed(0) + '%';
-  document.getElementById('bar_autt').style.width = Math.max(auttPct, 2) + '%';
-  document.getElementById('bar_autt').textContent = auttPct.toFixed(1) + '%';
-  document.getElementById('bar_saved').style.width = (100 - curTaxPct - auttPct) + '%';
-  document.getElementById('bar_saved').textContent = (curTaxPct - auttPct).toFixed(0) + '% freed';
-
-  // Cascade visualization
-  const vizEl = document.getElementById('cascade_viz');
-  vizEl.innerHTML = '';
-  const steps = 15;
-  let remaining = 10000;
-  const colors = ['#3b82f6','#6366f1','#8b5cf6','#a855f7','#c084fc','#d8b4fe','#e9d5ff','#f3e8ff','#faf5ff','#f0fdf4','#dcfce7','#bbf7d0','#86efac','#4ade80','#22c55e'];
-  for (let i = 0; i < steps; i++) {
-    const levied = remaining * tau;
-    remaining -= levied;
-    const w = Math.max(30, (remaining / 10000) * 200);
-    const step = document.createElement('div');
-    step.className = 'cascade-step';
-    step.style.width = w + 'px';
-    step.style.background = colors[i % colors.length];
-    step.textContent = cur + (remaining).toFixed(0);
-    vizEl.appendChild(step);
-    if (i < steps - 1) {
-      const arrow = document.createElement('span');
-      arrow.className = 'cascade-arrow';
-      arrow.textContent = '→';
-      vizEl.appendChild(arrow);
-    }
-  }
-
-  // Cumulative extraction
-  const cumExtract = (n) => (1 - Math.pow(1 - tau, n)) * 100;
-  document.getElementById('r_c10').textContent = cumExtract(10).toFixed(1) + '%';
-  document.getElementById('r_c50').textContent = cumExtract(50).toFixed(1) + '%';
-  document.getElementById('r_c100').textContent = cumExtract(100).toFixed(1) + '%';
-  document.getElementById('r_c200').textContent = cumExtract(200).toFixed(1) + '%';
-}
-
-// Init
+const P={us:{gdp:28.8,budget:6.1,vt:450,pop:335,cur:'$'},uk:{gdp:3.5,budget:1.2,vt:60,pop:68,cur:'£'},de:{gdp:4.5,budget:1.9,vt:80,pop:84,cur:'€'},fr:{gdp:3.1,budget:1.6,vt:55,pop:68,cur:'€'},ca:{gdp:2.1,budget:0.9,vt:120,pop:40,cur:'$'},jp:{gdp:4.2,budget:1.8,vt:250,pop:124,cur:'¥'}};
+function loadPreset(k,el){document.querySelectorAll('.preset-bar button').forEach(b=>b.classList.remove('active'));el.classList.add('active');if(k==='custom'){calc();return}const p=P[k];document.getElementById('gdp').value=p.gdp;document.getElementById('budget').value=p.budget;document.getElementById('vt').value=p.vt;document.getElementById('pop').value=p.pop;document.getElementById('currency').value=p.cur==='¥'?'¥':p.cur==='£'?'£':p.cur==='€'?'€':'$';calc()}
+function fm(n,c){if(Math.abs(n)>=1e12)return c+(n/1e12).toFixed(2)+'T';if(Math.abs(n)>=1e9)return c+(n/1e9).toFixed(1)+'B';if(Math.abs(n)>=1e6)return c+(n/1e6).toFixed(1)+'M';return c+n.toLocaleString('en-US',{maximumFractionDigits:0})}
+function ft(n,d){d=d||1;if(Math.abs(n)>=1e6)return(n/1e6).toFixed(d)+'M';if(Math.abs(n)>=1e3)return(n/1e3).toFixed(d)+'K';return n.toFixed(d)}
+function calc(){
+const c=document.getElementById('currency').value,g=+document.getElementById('gdp').value||0,b=+document.getElementById('budget').value||0,v=+document.getElementById('vt').value||1,p=+document.getElementById('pop').value||1,m=+document.getElementById('cascade').value||3,tk=+document.getElementById('takeup').value/100,ua=+document.getElementById('ubi_amount').value||24000,tx=+document.getElementById('tmax').value/100,ep=+document.getElementById('epsilon').value||5;
+const hi=+document.getElementById('hh_income').value||80000,hc=+document.getElementById('hh_cons').value/100,ht=+document.getElementById('hh_curtax').value/100,hu=+document.getElementById('hh_ubi').value;
+document.getElementById('mVal').textContent=m.toFixed(1);document.getElementById('takeupVal').textContent=(tk*100).toFixed(0)+'%';document.getElementById('ubiVal').textContent=c+ua.toLocaleString();document.getElementById('tmaxVal').textContent=(tx*100).toFixed(1)+'%';document.getElementById('epsVal').textContent=ep.toFixed(1);document.getElementById('consVal').textContent=(hc*100).toFixed(0)+'%';document.getElementById('curtaxVal').textContent=(ht*100).toFixed(0)+'%';
+const tau=b/v,tp=tau*100,cas=tau*m,cp=cas*100,vg=v/g,sp=ep*tau;
+const ad=p*.78,umax=ad*1e6*ua,uact=umax*tk,tmr=tx*v*1e12,bt=b*1e12,sur=tmr-bt;
+document.getElementById('r_tau').textContent=tp.toFixed(2)+'%';document.getElementById('r_tau_detail').textContent=tp<tx*100?'✓ Below τ_max ceiling':'⚠ Exceeds τ_max!';
+document.getElementById('r_cascade').textContent=cp.toFixed(1)+'%';document.getElementById('r_cascade_card').className='result-card '+(cp<10?'positive':cp<20?'gold':'negative');document.getElementById('r_cascade_detail').textContent='at m='+m.toFixed(1)+' (compare: VAT 10–25%)';
+document.getElementById('r_vgdp').textContent=vg.toFixed(1)+'×';
+document.getElementById('r_stable').textContent=sp.toFixed(3);document.getElementById('r_stable_card').className='result-card '+(sp<.25?'positive':sp<1?'gold':'negative');document.getElementById('r_stable_detail').textContent=sp<1?'✓ Stable (< 1.0)':'⚠ Unstable — spiral risk!';
+document.getElementById('r_ubi_max').textContent=fm(umax,c);document.getElementById('r_ubi_actual').textContent=fm(uact,c);document.getElementById('r_ubi_detail').textContent='at '+(tk*100).toFixed(0)+'% take-up ('+ft(ad*tk,1)+' claimants)';document.getElementById('r_maxrev').textContent=fm(tmr,c);document.getElementById('r_surplus').textContent=fm(sur,c);document.getElementById('r_surplus_card').className='result-card '+(sur>=0?'positive':'negative');
+const hta=hi*ht,hab=hi*hc*cas,hdc=hi-hta,hubi=hu*ua,hda=hi-hab+hubi,hgn=hda-hdc;
+document.getElementById('r_hh_curtax').textContent=fm(hta,c);document.getElementById('r_hh_curtax_d').textContent=(ht*100).toFixed(0)+'% effective rate';document.getElementById('r_hh_autt').textContent=fm(hab,c);document.getElementById('r_hh_autt_d').textContent=(cas*hc*100).toFixed(2)+'% effective on income';document.getElementById('r_hh_disp_cur').textContent=fm(hdc,c);document.getElementById('r_hh_disp_autt').textContent=fm(hda,c);
+document.getElementById('r_hh_gain').textContent=(hgn>=0?'+':'')+fm(hgn,c);const gp=((hgn/Math.max(hdc,1))*100).toFixed(0);document.getElementById('r_hh_gain_d').textContent=(hgn>=0?'+':'')+gp+'% change in disposable income'+(hu>0?' (incl. UBI)':'');document.getElementById('r_hh_gain').parentElement.className='result-card full-width '+(hgn>=0?'positive':'negative');
+const ctp=hta/hi*100,ap=hab/hi*100;document.getElementById('bar_curtax').style.width=ctp+'%';document.getElementById('bar_curtax').textContent=ctp.toFixed(0)+'%';document.getElementById('bar_autt').style.width=Math.max(ap,2)+'%';document.getElementById('bar_autt').textContent=ap.toFixed(1)+'%';document.getElementById('bar_saved').style.width=Math.max(100-ctp-ap,0)+'%';document.getElementById('bar_saved').textContent=(ctp-ap).toFixed(0)+'% freed';
+const vz=document.getElementById('cascade_viz');vz.innerHTML='';let rm=10000;const cl=['#3b82f6','#6366f1','#8b5cf6','#a855f7','#c084fc','#d8b4fe','#e9d5ff','#f3e8ff','#faf5ff','#f0fdf4','#dcfce7','#bbf7d0','#86efac','#4ade80','#22c55e'];
+for(let i=0;i<15;i++){rm-=rm*tau;const w=Math.max(30,rm/10000*200),s=document.createElement('div');s.className='cascade-step';s.style.width=w+'px';s.style.background=cl[i%cl.length];s.textContent=c+rm.toFixed(0);vz.appendChild(s);if(i<14){const a=document.createElement('span');a.className='cascade-arrow';a.textContent='→';vz.appendChild(a)}}
+const ce=n=>(1-Math.pow(1-tau,n))*100;document.getElementById('r_c10').textContent=ce(10).toFixed(1)+'%';document.getElementById('r_c50').textContent=ce(50).toFixed(1)+'%';document.getElementById('r_c100').textContent=ce(100).toFixed(1)+'%';document.getElementById('r_c200').textContent=ce(200).toFixed(1)+'%'}
 calc();
 </script>
-
 </body>
 </html>
