@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AUTT-UBI Fiscal Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0e17;
+  --surface: #111827;
+  --surface2: #1a2235;
+  --border: #2a3550;
+  --text: #e2e8f0;
+  --text2: #94a3b8;
+  --accent: #38bdf8;
+  --accent2: #818cf8;
+  --green: #4ade80;
+  --red: #f87171;
+  --gold: #fbbf24;
+  --glow: rgba(56, 189, 248, 0.08);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.6;
+}
+.container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+header {
+  text-align: center;
+  padding: 40px 20px 30px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 30px;
+}
+header h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 2.2em;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 8px;
+}
+header p { color: var(--text2); font-size: 0.95em; max-width: 700px; margin: 0 auto; }
+header .subtitle { font-size: 0.8em; color: var(--text2); opacity: 0.6; margin-top: 4px; }
+
+.grid { display: grid; grid-template-columns: 340px 1fr; gap: 24px; }
+@media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+}
+.panel h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.15em;
+  color: var(--accent);
+  margin-bottom: 16px;
+  display: flex; align-items: center; gap: 8px;
+}
+.panel h2 .icon { font-size: 1.2em; }
+
+.input-group { margin-bottom: 16px; }
+.input-group label {
+  display: block;
+  font-size: 0.78em;
+  font-weight: 500;
+  color: var(--text2);
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.input-group input, .input-group select {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9em;
+  transition: border-color 0.2s;
+}
+.input-group input:focus, .input-group select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--glow);
+}
+.input-group .hint { font-size: 0.7em; color: var(--text2); opacity: 0.6; margin-top: 3px; }
+
+.slider-group { margin-bottom: 16px; }
+.slider-group label {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 0.78em; font-weight: 500; color: var(--text2);
+  text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px;
+}
+.slider-group label span {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--accent); font-size: 1.1em;
+}
+input[type="range"] {
+  width: 100%; height: 6px; -webkit-appearance: none; appearance: none;
+  background: var(--surface2); border-radius: 3px; outline: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 18px; height: 18px;
+  background: var(--accent); border-radius: 50%; cursor: pointer;
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
+}
+
+.results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 600px) { .results-grid { grid-template-columns: 1fr; } }
+
+.result-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.result-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+.result-card .label {
+  font-size: 0.72em; text-transform: uppercase; letter-spacing: 0.5px;
+  color: var(--text2); margin-bottom: 4px;
+}
+.result-card .value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.5em; font-weight: 700;
+}
+.result-card .detail { font-size: 0.75em; color: var(--text2); margin-top: 4px; }
+.result-card.positive .value { color: var(--green); }
+.result-card.negative .value { color: var(--red); }
+.result-card.neutral .value { color: var(--accent); }
+.result-card.gold .value { color: var(--gold); }
+.result-card.full-width { grid-column: 1 / -1; }
+
+.comparison-bar {
+  height: 28px; border-radius: 6px; overflow: hidden;
+  display: flex; margin: 8px 0; background: var(--surface);
+}
+.comparison-bar .segment {
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7em; font-weight: 600; color: #fff;
+  transition: width 0.5s ease;
+}
+
+.section-divider {
+  border: none; border-top: 1px solid var(--border);
+  margin: 20px 0;
+}
+
+.cascade-viz {
+  display: flex; align-items: center; gap: 2px;
+  margin: 10px 0; flex-wrap: wrap;
+}
+.cascade-step {
+  height: 24px; border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6em; color: #fff; font-weight: 600;
+  transition: width 0.4s ease;
+}
+.cascade-arrow { color: var(--text2); font-size: 0.7em; }
+
+.tab-bar {
+  display: flex; gap: 4px; margin-bottom: 16px;
+  border-bottom: 1px solid var(--border); padding-bottom: 8px;
+}
+.tab-bar button {
+  background: none; border: none; color: var(--text2);
+  font-family: 'DM Sans', sans-serif; font-size: 0.82em;
+  padding: 6px 14px; border-radius: 6px 6px 0 0; cursor: pointer;
+  transition: all 0.2s;
+}
+.tab-bar button.active {
+  color: var(--accent); background: var(--glow);
+  border-bottom: 2px solid var(--accent);
+}
+.tab-bar button:hover { color: var(--text); }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+.preset-bar {
+  display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap;
+}
+.preset-bar button {
+  background: var(--surface2); border: 1px solid var(--border);
+  color: var(--text2); padding: 5px 12px; border-radius: 6px;
+  font-size: 0.75em; cursor: pointer; transition: all 0.2s;
+  font-family: 'DM Sans', sans-serif;
+}
+.preset-bar button:hover, .preset-bar button.active {
+  border-color: var(--accent); color: var(--accent);
+  background: var(--glow);
+}
+
+.footer {
+  text-align: center; padding: 30px 20px; margin-top: 30px;
+  border-top: 1px solid var(--border);
+  color: var(--text2); font-size: 0.75em;
+}
+.footer a { color: var(--accent); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>AUTT-UBI Fiscal Calculator</h1>
+  <p>Interactive model for the Adaptive Universal Transaction Tax and Request-Based Universal Basic Income system</p>
+  <div class="subtitle">Based on Kriger (2026) — Formal Model with Feedback Control</div>
+</header>
+
+<div class="container">
+  <div class="preset-bar" id="presets">
+    <button onclick="loadPreset('us')" class="active">🇺🇸 United States</button>
+    <button onclick="loadPreset('uk')">🇬🇧 United Kingdom</button>
+    <button onclick="loadPreset('de')">🇩🇪 Germany</button>
+    <button onclick="loadPreset('fr')">🇫🇷 France</button>
+    <button onclick="loadPreset('ca')">🇨🇦 Canada</button>
+    <button onclick="loadPreset('jp')">🇯🇵 Japan</button>
+    <button onclick="loadPreset('custom')">⚙️ Custom</button>
+  </div>
+
+  <div class="grid">
+    <!-- LEFT: INPUTS -->
+    <div>
+      <div class="panel">
+        <h2><span class="icon">🏛️</span> Country Parameters</h2>
+        <div class="input-group">
+          <label>GDP (trillions, local currency)</label>
+          <input type="number" id="gdp" value="28.8" step="0.1" oninput="calc()">
+        </div>
+        <div class="input-group">
+          <label>Government Budget (trillions)</label>
+          <input type="number" id="budget" value="6.1" step="0.1" oninput="calc()">
+        </div>
+        <div class="input-group">
+          <label>Taxable Transaction Volume V_T (trillions)</label>
+          <input type="number" id="vt" value="450" step="10" oninput="calc()">
+          <div class="hint">After financial-sector exemptions (φ ≈ 0.75–0.85)</div>
+        </div>
+        <div class="input-group">
+          <label>Population (millions)</label>
+          <input type="number" id="pop" value="335" step="1" oninput="calc()">
+        </div>
+        <div class="input-group">
+          <label>Currency</label>
+          <select id="currency" onchange="calc()">
+            <option value="$">$ (USD/CAD/AUD)</option>
+            <option value="£">£ (GBP)</option>
+            <option value="€">€ (EUR)</option>
+            <option value="¥">¥ (JPY)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top: 16px;">
+        <h2><span class="icon">🎛️</span> Model Parameters</h2>
+        <div class="slider-group">
+          <label>Cascade multiplier (m) <span id="mVal">3</span></label>
+          <input type="range" id="cascade" min="1" max="10" step="0.5" value="3" oninput="calc()">
+        </div>
+        <div class="slider-group">
+          <label>UBI take-up rate <span id="takeupVal">45%</span></label>
+          <input type="range" id="takeup" min="10" max="100" step="5" value="45" oninput="calc()">
+        </div>
+        <div class="slider-group">
+          <label>Annual UBI per adult <span id="ubiVal">$24,000</span></label>
+          <input type="range" id="ubi_amount" min="6000" max="48000" step="1000" value="24000" oninput="calc()">
+        </div>
+        <div class="slider-group">
+          <label>τ_max ceiling <span id="tmaxVal">2.0%</span></label>
+          <input type="range" id="tmax" min="0.5" max="5" step="0.1" value="2" oninput="calc()">
+        </div>
+        <div class="slider-group">
+          <label>Elasticity (ε) <span id="epsVal">5.0</span></label>
+          <input type="range" id="epsilon" min="0.5" max="20" step="0.5" value="5" oninput="calc()">
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top: 16px;">
+        <h2><span class="icon">👤</span> Household Calculator</h2>
+        <div class="input-group">
+          <label>Household annual income</label>
+          <input type="number" id="hh_income" value="80000" step="1000" oninput="calc()">
+        </div>
+        <div class="slider-group">
+          <label>Consumption rate <span id="consVal">75%</span></label>
+          <input type="range" id="hh_cons" min="20" max="100" step="5" value="75" oninput="calc()">
+        </div>
+        <div class="slider-group">
+          <label>Current effective tax rate <span id="curtaxVal">26%</span></label>
+          <input type="range" id="hh_curtax" min="5" max="50" step="1" value="26" oninput="calc()">
+        </div>
+        <div class="input-group">
+          <label>Claims UBI?</label>
+          <select id="hh_ubi" onchange="calc()">
+            <option value="0">No</option>
+            <option value="1" selected>Yes (1 adult)</option>
+            <option value="2">Yes (2 adults)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: RESULTS -->
+    <div>
+      <div class="panel">
+        <h2><span class="icon">📊</span> AUTT Core Results</h2>
+        <div class="results-grid">
+          <div class="result-card neutral">
+            <div class="label">Required AUTT Rate (τ)</div>
+            <div class="value" id="r_tau">—</div>
+            <div class="detail" id="r_tau_detail"></div>
+          </div>
+          <div class="result-card" id="r_cascade_card">
+            <div class="label">Effective Cascade Burden</div>
+            <div class="value" id="r_cascade">—</div>
+            <div class="detail" id="r_cascade_detail"></div>
+          </div>
+          <div class="result-card gold">
+            <div class="label">V / GDP Ratio</div>
+            <div class="value" id="r_vgdp">—</div>
+            <div class="detail">Transaction intensity of economy</div>
+          </div>
+          <div class="result-card" id="r_stable_card">
+            <div class="label">Spiral Stability (ε·τ*)</div>
+            <div class="value" id="r_stable">—</div>
+            <div class="detail" id="r_stable_detail"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top: 16px;">
+        <h2><span class="icon">💰</span> UBI Fiscal Impact</h2>
+        <div class="results-grid">
+          <div class="result-card neutral">
+            <div class="label">Max UBI Cost (100% take-up)</div>
+            <div class="value" id="r_ubi_max">—</div>
+          </div>
+          <div class="result-card positive">
+            <div class="label">Projected UBI Cost (request-based)</div>
+            <div class="value" id="r_ubi_actual">—</div>
+            <div class="detail" id="r_ubi_detail"></div>
+          </div>
+          <div class="result-card neutral">
+            <div class="label">τ_max Revenue Capacity</div>
+            <div class="value" id="r_maxrev">—</div>
+          </div>
+          <div class="result-card" id="r_surplus_card">
+            <div class="label">Fiscal Surplus / Deficit at τ_max</div>
+            <div class="value" id="r_surplus">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top: 16px;">
+        <h2><span class="icon">🏠</span> Household Comparison</h2>
+        <div class="results-grid">
+          <div class="result-card negative">
+            <div class="label">Current System — Total Tax</div>
+            <div class="value" id="r_hh_curtax">—</div>
+            <div class="detail" id="r_hh_curtax_d"></div>
+          </div>
+          <div class="result-card positive">
+            <div class="label">AUTT System — Effective Burden</div>
+            <div class="value" id="r_hh_autt">—</div>
+            <div class="detail" id="r_hh_autt_d"></div>
+          </div>
+          <div class="result-card negative">
+            <div class="label">Current Disposable Income</div>
+            <div class="value" id="r_hh_disp_cur">—</div>
+          </div>
+          <div class="result-card positive">
+            <div class="label">AUTT Disposable Income</div>
+            <div class="value" id="r_hh_disp_autt">—</div>
+          </div>
+          <div class="result-card positive full-width">
+            <div class="label">Capital Liberation (Annual Gain)</div>
+            <div class="value" id="r_hh_gain">—</div>
+            <div class="detail" id="r_hh_gain_d"></div>
+          </div>
+        </div>
+
+        <hr class="section-divider">
+        <div class="label" style="font-size:0.72em;text-transform:uppercase;letter-spacing:0.5px;color:var(--text2);margin-bottom:8px;">Tax Burden Comparison</div>
+        <div class="comparison-bar">
+          <div class="segment" id="bar_curtax" style="background:#ef4444;"></div>
+          <div class="segment" id="bar_autt" style="background:#22c55e;"></div>
+          <div class="segment" id="bar_saved" style="background:var(--surface2); color:var(--text2);"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:0.7em;color:var(--text2);">
+          <span>🔴 Current tax</span><span>🟢 AUTT cascade</span><span>⬜ Liberated</span>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top: 16px;">
+        <h2><span class="icon">🔗</span> Cascade Visualization</h2>
+        <div style="font-size:0.8em;color:var(--text2);margin-bottom:10px;">
+          Money passing through successive transactions — government extraction at each step
+        </div>
+        <div class="cascade-viz" id="cascade_viz"></div>
+        <div class="results-grid" style="margin-top:12px;">
+          <div class="result-card neutral">
+            <div class="label">After 10 transactions</div>
+            <div class="value" id="r_c10">—</div>
+          </div>
+          <div class="result-card neutral">
+            <div class="label">After 50 transactions</div>
+            <div class="value" id="r_c50">—</div>
+          </div>
+          <div class="result-card neutral">
+            <div class="label">After 100 transactions</div>
+            <div class="value" id="r_c100">—</div>
+          </div>
+          <div class="result-card neutral">
+            <div class="label">After 200 transactions</div>
+            <div class="value" id="r_c200">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <p><strong>AUTT-UBI Fiscal Calculator</strong> — Based on Kriger, B. (2026). <em>Adaptive Universal Transaction Tax and Request-Based Universal Basic Income</em>.</p>
+  <p style="margin-top:4px;">Interactive companion to the formal model. All calculations are illustrative. <a href="#">View paper on Zenodo</a></p>
+</div>
+
+<script>
+const presets = {
+  us:  { gdp:28.8, budget:6.1, vt:450, pop:335, cur:'$', name:'United States' },
+  uk:  { gdp:3.5,  budget:1.2, vt:60,  pop:68,  cur:'£', name:'United Kingdom' },
+  de:  { gdp:4.5,  budget:1.9, vt:80,  pop:84,  cur:'€', name:'Germany' },
+  fr:  { gdp:3.1,  budget:1.6, vt:55,  pop:68,  cur:'€', name:'France' },
+  ca:  { gdp:2.1,  budget:0.9, vt:120, pop:40,  cur:'$', name:'Canada' },
+  jp:  { gdp:4.2,  budget:1.8, vt:250, pop:124, cur:'¥', name:'Japan' }
+};
+
+function loadPreset(key) {
+  document.querySelectorAll('.preset-bar button').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  if (key === 'custom') { calc(); return; }
+  const p = presets[key];
+  document.getElementById('gdp').value = p.gdp;
+  document.getElementById('budget').value = p.budget;
+  document.getElementById('vt').value = p.vt;
+  document.getElementById('pop').value = p.pop;
+  document.getElementById('currency').value = p.cur === '¥' ? '¥' : p.cur === '£' ? '£' : p.cur === '€' ? '€' : '$';
+  calc();
+}
+
+function fmt(n, decimals=1) {
+  if (Math.abs(n) >= 1e12) return (n/1e12).toFixed(decimals) + 'T';
+  if (Math.abs(n) >= 1e9) return (n/1e9).toFixed(decimals) + 'B';
+  if (Math.abs(n) >= 1e6) return (n/1e6).toFixed(decimals) + 'M';
+  if (Math.abs(n) >= 1e3) return (n/1e3).toFixed(decimals) + 'K';
+  return n.toFixed(decimals);
+}
+
+function fmtMoney(n, cur) {
+  if (Math.abs(n) >= 1e12) return cur + (n/1e12).toFixed(2) + 'T';
+  if (Math.abs(n) >= 1e9) return cur + (n/1e9).toFixed(1) + 'B';
+  if (Math.abs(n) >= 1e6) return cur + (n/1e6).toFixed(1) + 'M';
+  return cur + n.toLocaleString('en-US', {maximumFractionDigits:0});
+}
+
+function calc() {
+  const cur = document.getElementById('currency').value;
+  const gdp = parseFloat(document.getElementById('gdp').value) || 0;
+  const budget = parseFloat(document.getElementById('budget').value) || 0;
+  const vt = parseFloat(document.getElementById('vt').value) || 1;
+  const pop = parseFloat(document.getElementById('pop').value) || 1;
+  const m = parseFloat(document.getElementById('cascade').value) || 3;
+  const takeup = parseFloat(document.getElementById('takeup').value) / 100;
+  const ubiAmt = parseFloat(document.getElementById('ubi_amount').value) || 24000;
+  const tmax = parseFloat(document.getElementById('tmax').value) / 100;
+  const eps = parseFloat(document.getElementById('epsilon').value) || 5;
+
+  const hhIncome = parseFloat(document.getElementById('hh_income').value) || 80000;
+  const hhCons = parseFloat(document.getElementById('hh_cons').value) / 100;
+  const hhCurTax = parseFloat(document.getElementById('hh_curtax').value) / 100;
+  const hhUbiAdults = parseInt(document.getElementById('hh_ubi').value);
+
+  // Update slider labels
+  document.getElementById('mVal').textContent = m.toFixed(1);
+  document.getElementById('takeupVal').textContent = (takeup*100).toFixed(0) + '%';
+  document.getElementById('ubiVal').textContent = cur + ubiAmt.toLocaleString();
+  document.getElementById('tmaxVal').textContent = (tmax*100).toFixed(1) + '%';
+  document.getElementById('epsVal').textContent = eps.toFixed(1);
+  document.getElementById('consVal').textContent = (hhCons*100).toFixed(0) + '%';
+  document.getElementById('curtaxVal').textContent = (hhCurTax*100).toFixed(0) + '%';
+
+  // Core calculations
+  const tau = budget / vt; // required rate
+  const tauPct = tau * 100;
+  const cascade = tau * m;
+  const cascadePct = cascade * 100;
+  const vgdp = vt / gdp;
+  const spiralProduct = eps * tau;
+
+  // UBI
+  const adults = pop * 0.78; // ~78% adult
+  const ubiMaxCost = adults * 1e6 * ubiAmt;
+  const ubiActualCost = ubiMaxCost * takeup;
+  const tmaxRev = tmax * vt * 1e12;
+  const budgetTotal = budget * 1e12;
+  const surplus = tmaxRev - budgetTotal;
+
+  // Results
+  document.getElementById('r_tau').textContent = tauPct.toFixed(2) + '%';
+  document.getElementById('r_tau_detail').textContent = tauPct < tmax*100 ? '✓ Below τ_max ceiling' : '⚠ Exceeds τ_max!';
+
+  document.getElementById('r_cascade').textContent = cascadePct.toFixed(1) + '%';
+  const cascadeCard = document.getElementById('r_cascade_card');
+  cascadeCard.className = 'result-card ' + (cascadePct < 10 ? 'positive' : cascadePct < 20 ? 'gold' : 'negative');
+  document.getElementById('r_cascade_detail').textContent = 'at m=' + m.toFixed(1) + ' (compare: VAT 10–25%)';
+
+  document.getElementById('r_vgdp').textContent = vgdp.toFixed(1) + '×';
+
+  document.getElementById('r_stable').textContent = spiralProduct.toFixed(3);
+  const stableCard = document.getElementById('r_stable_card');
+  stableCard.className = 'result-card ' + (spiralProduct < 0.25 ? 'positive' : spiralProduct < 1 ? 'gold' : 'negative');
+  document.getElementById('r_stable_detail').textContent = spiralProduct < 1 ? '✓ Stable (< 1.0)' : '⚠ Unstable — spiral risk!';
+
+  document.getElementById('r_ubi_max').textContent = fmtMoney(ubiMaxCost, cur);
+  document.getElementById('r_ubi_actual').textContent = fmtMoney(ubiActualCost, cur);
+  document.getElementById('r_ubi_detail').textContent = 'at ' + (takeup*100).toFixed(0) + '% take-up (' + fmt(adults*takeup, 1) + 'M claimants)';
+  document.getElementById('r_maxrev').textContent = fmtMoney(tmaxRev, cur);
+  document.getElementById('r_surplus').textContent = fmtMoney(surplus, cur);
+  const surplusCard = document.getElementById('r_surplus_card');
+  surplusCard.className = 'result-card ' + (surplus >= 0 ? 'positive' : 'negative');
+
+  // Household
+  const hhCurTaxAmt = hhIncome * hhCurTax;
+  const hhAuttBurden = hhIncome * hhCons * cascade;
+  const hhDispCur = hhIncome - hhCurTaxAmt;
+  const hhUbiReceived = hhUbiAdults * ubiAmt;
+  const hhDispAutt = hhIncome - hhAuttBurden + hhUbiReceived;
+  const hhGain = hhDispAutt - hhDispCur;
+
+  document.getElementById('r_hh_curtax').textContent = fmtMoney(hhCurTaxAmt, cur);
+  document.getElementById('r_hh_curtax_d').textContent = (hhCurTax*100).toFixed(0) + '% effective rate';
+  document.getElementById('r_hh_autt').textContent = fmtMoney(hhAuttBurden, cur);
+  document.getElementById('r_hh_autt_d').textContent = (cascade*hhCons*100).toFixed(2) + '% effective on income';
+  document.getElementById('r_hh_disp_cur').textContent = fmtMoney(hhDispCur, cur);
+  document.getElementById('r_hh_disp_autt').textContent = fmtMoney(hhDispAutt, cur);
+  document.getElementById('r_hh_gain').textContent = (hhGain >= 0 ? '+' : '') + fmtMoney(hhGain, cur);
+  const gainPct = ((hhGain / hhDispCur) * 100).toFixed(0);
+  document.getElementById('r_hh_gain_d').textContent = (hhGain >= 0 ? '+' : '') + gainPct + '% change in disposable income' + (hhUbiAdults > 0 ? ' (incl. UBI)' : '');
+  document.getElementById('r_hh_gain').parentElement.className = 'result-card full-width ' + (hhGain >= 0 ? 'positive' : 'negative');
+
+  // Comparison bar
+  const totalIncome = hhIncome;
+  const curTaxPct = (hhCurTaxAmt / totalIncome * 100);
+  const auttPct = (hhAuttBurden / totalIncome * 100);
+  const savedPct = 100 - curTaxPct;
+  document.getElementById('bar_curtax').style.width = curTaxPct + '%';
+  document.getElementById('bar_curtax').textContent = curTaxPct.toFixed(0) + '%';
+  document.getElementById('bar_autt').style.width = Math.max(auttPct, 2) + '%';
+  document.getElementById('bar_autt').textContent = auttPct.toFixed(1) + '%';
+  document.getElementById('bar_saved').style.width = (100 - curTaxPct - auttPct) + '%';
+  document.getElementById('bar_saved').textContent = (curTaxPct - auttPct).toFixed(0) + '% freed';
+
+  // Cascade visualization
+  const vizEl = document.getElementById('cascade_viz');
+  vizEl.innerHTML = '';
+  const steps = 15;
+  let remaining = 10000;
+  const colors = ['#3b82f6','#6366f1','#8b5cf6','#a855f7','#c084fc','#d8b4fe','#e9d5ff','#f3e8ff','#faf5ff','#f0fdf4','#dcfce7','#bbf7d0','#86efac','#4ade80','#22c55e'];
+  for (let i = 0; i < steps; i++) {
+    const levied = remaining * tau;
+    remaining -= levied;
+    const w = Math.max(30, (remaining / 10000) * 200);
+    const step = document.createElement('div');
+    step.className = 'cascade-step';
+    step.style.width = w + 'px';
+    step.style.background = colors[i % colors.length];
+    step.textContent = cur + (remaining).toFixed(0);
+    vizEl.appendChild(step);
+    if (i < steps - 1) {
+      const arrow = document.createElement('span');
+      arrow.className = 'cascade-arrow';
+      arrow.textContent = '→';
+      vizEl.appendChild(arrow);
+    }
+  }
+
+  // Cumulative extraction
+  const cumExtract = (n) => (1 - Math.pow(1 - tau, n)) * 100;
+  document.getElementById('r_c10').textContent = cumExtract(10).toFixed(1) + '%';
+  document.getElementById('r_c50').textContent = cumExtract(50).toFixed(1) + '%';
+  document.getElementById('r_c100').textContent = cumExtract(100).toFixed(1) + '%';
+  document.getElementById('r_c200').textContent = cumExtract(200).toFixed(1) + '%';
+}
+
+// Init
+calc();
+</script>
+
+</body>
+</html>
