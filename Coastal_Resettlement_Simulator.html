@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coastal Resettlement Simulator — Decentralised Urbanism Framework</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg: #0a0e17;
+  --bg2: #111827;
+  --bg3: #1a2235;
+  --accent: #3b82f6;
+  --accent2: #10b981;
+  --warn: #f59e0b;
+  --danger: #ef4444;
+  --text: #e2e8f0;
+  --text2: #94a3b8;
+  --border: #2d3a52;
+  --sea: #1e40af;
+  --sea-rise: rgba(239, 68, 68, 0.35);
+  --cluster: #10b981;
+  --highway: #f59e0b;
+  --house: #3b82f6;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.header {
+  background: linear-gradient(135deg, var(--bg2) 0%, var(--bg3) 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 20px 30px;
+  display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+}
+
+.header h1 {
+  font-size: 1.3rem; font-weight: 700;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  letter-spacing: -0.02em;
+}
+.header .subtitle { font-size: 0.78rem; color: var(--text2); }
+
+.main { display: grid; grid-template-columns: 340px 1fr; min-height: calc(100vh - 80px); }
+
+.panel {
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  padding: 16px;
+  overflow-y: auto;
+  max-height: calc(100vh - 80px);
+}
+
+.panel h2 { font-size: 0.85rem; font-weight: 700; color: var(--accent); margin: 16px 0 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+.panel h2:first-child { margin-top: 0; }
+
+.preset-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 4px;
+}
+.preset-btn {
+  background: var(--bg3); border: 1px solid var(--border); border-radius: 6px;
+  color: var(--text); font-size: 0.72rem; padding: 6px 8px; cursor: pointer;
+  font-family: inherit; transition: all 0.15s;
+  text-align: left; line-height: 1.3;
+}
+.preset-btn:hover { border-color: var(--accent); background: rgba(59,130,246,0.1); }
+.preset-btn.active { border-color: var(--accent); background: rgba(59,130,246,0.15); }
+.preset-btn .city-name { font-weight: 700; display: block; }
+.preset-btn .city-info { color: var(--text2); font-size: 0.65rem; }
+
+.slider-group { margin-bottom: 12px; }
+.slider-label {
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-size: 0.75rem; margin-bottom: 4px;
+}
+.slider-label span:first-child { color: var(--text2); }
+.slider-label .val { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--accent); font-weight: 500; }
+
+input[type="range"] {
+  -webkit-appearance: none; width: 100%; height: 4px;
+  border-radius: 2px; background: var(--bg3); outline: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 14px; height: 14px;
+  border-radius: 50%; background: var(--accent); cursor: pointer;
+  border: 2px solid var(--bg); box-shadow: 0 0 6px rgba(59,130,246,0.4);
+}
+
+.results {
+  background: var(--bg3); border: 1px solid var(--border); border-radius: 8px;
+  padding: 12px; margin-top: 12px;
+}
+.result-row {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding: 4px 0; font-size: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.result-row:last-child { border: none; }
+.result-row .label { color: var(--text2); }
+.result-row .value { font-family: 'JetBrains Mono', monospace; font-weight: 500; }
+.result-row .value.green { color: var(--accent2); }
+.result-row .value.yellow { color: var(--warn); }
+.result-row .value.red { color: var(--danger); }
+.result-row .value.blue { color: var(--accent); }
+
+.map-area {
+  position: relative; overflow: hidden;
+  background: var(--bg);
+}
+
+canvas { display: block; width: 100%; height: 100%; }
+
+.legend {
+  position: absolute; bottom: 16px; right: 16px;
+  background: rgba(17,24,39,0.92); border: 1px solid var(--border);
+  border-radius: 8px; padding: 12px 14px; font-size: 0.7rem;
+}
+.legend-item { display: flex; align-items: center; gap: 8px; padding: 2px 0; }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+.info-bar {
+  position: absolute; top: 12px; left: 12px;
+  background: rgba(17,24,39,0.92); border: 1px solid var(--border);
+  border-radius: 8px; padding: 10px 14px; font-size: 0.72rem; max-width: 280px;
+}
+.info-bar .city-title { font-weight: 700; font-size: 0.9rem; color: var(--accent); margin-bottom: 4px; }
+
+.timeline {
+  position: absolute; bottom: 16px; left: 16px; right: 180px;
+  background: rgba(17,24,39,0.92); border: 1px solid var(--border);
+  border-radius: 8px; padding: 10px 14px;
+}
+.timeline-label { font-size: 0.7rem; color: var(--text2); margin-bottom: 4px; display: flex; justify-content: space-between; }
+.timeline input[type="range"] { width: 100%; }
+
+.badge {
+  display: inline-block; padding: 1px 6px; border-radius: 3px;
+  font-size: 0.6rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.badge-safe { background: rgba(16,185,129,0.15); color: var(--accent2); }
+.badge-warn { background: rgba(245,158,11,0.15); color: var(--warn); }
+.badge-danger { background: rgba(239,68,68,0.15); color: var(--danger); }
+
+@media (max-width: 900px) {
+  .main { grid-template-columns: 1fr; }
+  .panel { max-height: none; border-right: none; border-bottom: 1px solid var(--border); }
+  .map-area { height: 500px; }
+}
+
+.tabs {
+  display: flex; gap: 0; border-bottom: 1px solid var(--border);
+  background: var(--bg2);
+}
+.tab-btn {
+  padding: 10px 20px; font-family: inherit; font-size: 0.8rem; font-weight: 600;
+  background: transparent; border: none; color: var(--text2); cursor: pointer;
+  border-bottom: 2px solid transparent; transition: all 0.15s;
+}
+.tab-btn:hover { color: var(--text); }
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+.tab-content { display: none; position: relative; width: 100%; height: 100%; }
+.tab-content.active { display: block; }
+
+.sap-view {
+  padding: 30px; overflow-y: auto; max-height: calc(100vh - 120px);
+}
+.sap-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 20px;
+}
+.sap-card {
+  background: var(--bg3); border: 1px solid var(--border); border-radius: 10px;
+  padding: 16px; transition: border-color 0.2s;
+}
+.sap-card:hover { border-color: var(--accent); }
+.sap-card h3 {
+  font-size: 0.85rem; font-weight: 700; margin-bottom: 6px;
+  display: flex; align-items: center; gap: 8px;
+}
+.sap-card p { font-size: 0.75rem; color: var(--text2); line-height: 1.5; }
+.sap-card .spec { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--accent); margin-top: 6px; }
+.sap-icon { font-size: 1.1rem; }
+.sap-title {
+  font-size: 1.1rem; font-weight: 700; margin-bottom: 6px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.sap-subtitle { font-size: 0.78rem; color: var(--text2); margin-bottom: 16px; }
+.sap-diagram {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 10px;
+  padding: 20px; margin-bottom: 24px; text-align: center;
+}
+.sap-full { grid-column: 1 / -1; }
+.sap-specs-table { width: 100%; border-collapse: collapse; font-size: 0.73rem; }
+.sap-specs-table td { padding: 5px 8px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+.sap-specs-table td:first-child { color: var(--text2); width: 55%; }
+.sap-specs-table td:last-child { font-family: 'JetBrains Mono', monospace; color: var(--accent2); text-align: right; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>Coastal Resettlement Simulator</h1>
+    <div class="subtitle">Decentralised Urbanism Framework — Appendix B Interactive Model · Kriger (2026)</div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="panel" id="panel">
+    <h2>City Presets</h2>
+    <div class="preset-grid" id="presets"></div>
+
+    <h2>Sea-Level Rise</h2>
+    <div class="slider-group">
+      <div class="slider-label"><span>Projected rise by 2100</span><span class="val" id="slrVal">1.0 m</span></div>
+      <input type="range" id="slr" min="0.3" max="3.0" step="0.1" value="1.0">
+    </div>
+
+    <h2>Resettlement Parameters</h2>
+    <div class="slider-group">
+      <div class="slider-label"><span>Annual resettlement rate</span><span class="val" id="resRateVal">3.0%</span></div>
+      <input type="range" id="resRate" min="0.5" max="10" step="0.5" value="3.0">
+    </div>
+    <div class="slider-group">
+      <div class="slider-label"><span>Bulk unit cost (per home)</span><span class="val" id="unitCostVal">$12K</span></div>
+      <input type="range" id="unitCost" min="8" max="80" step="1" value="12">
+    </div>
+    <div class="slider-group">
+      <div class="slider-label"><span>Homes per cluster</span><span class="val" id="clusterSizeVal">12</span></div>
+      <input type="range" id="clusterSize" min="4" max="24" step="2" value="12">
+    </div>
+    <div class="slider-group">
+      <div class="slider-label"><span>Highway corridor length (km)</span><span class="val" id="corridorVal">80 km</span></div>
+      <input type="range" id="corridor" min="20" max="200" step="10" value="80">
+    </div>
+    <div class="slider-group">
+      <div class="slider-label"><span>Spacing between clusters (km)</span><span class="val" id="spacingVal">2.0 km</span></div>
+      <input type="range" id="spacing" min="0.5" max="5" step="0.25" value="2.0">
+    </div>
+    <div class="slider-group">
+      <div class="slider-label"><span>Persons per home</span><span class="val" id="pphVal">3.2</span></div>
+      <input type="range" id="pph" min="1.5" max="5" step="0.1" value="3.2">
+    </div>
+
+    <h2>Results</h2>
+    <div class="results" id="results"></div>
+
+    <h2>Density Comparison</h2>
+    <div class="results" id="densityResults"></div>
+  </div>
+
+  <div class="map-area">
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('map')">Resettlement Map</button>
+      <button class="tab-btn" onclick="switchTab('sap')">Autonomous Home (SAP)</button>
+    </div>
+
+    <div class="tab-content active" id="tab-map" style="height: calc(100% - 41px);">
+    <canvas id="canvas"></canvas>
+    <div class="info-bar" id="infoBar"></div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#1e40af"></div> Ocean / coast</div>
+      <div class="legend-item"><div class="legend-dot" style="background:rgba(239,68,68,0.6)"></div> Flood zone (sea-level rise)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div> Highway corridors</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#10b981"></div> Autonomous clusters (12 homes)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div> Individual homes</div>
+      <div class="legend-item"><div class="legend-dot" style="background:rgba(255,255,255,0.15)"></div> Collector roads</div>
+    </div>
+    <div class="timeline">
+      <div class="timeline-label">
+        <span>Simulation year</span>
+        <span class="val" id="yearVal">2026</span>
+      </div>
+      <input type="range" id="yearSlider" min="2026" max="2100" step="1" value="2026">
+    </div>
+    </div>
+
+    <div class="tab-content" id="tab-sap">
+      <div class="sap-view">
+        <div class="sap-title">Standardised Autonomous Platform (SAP)</div>
+        <div class="sap-subtitle">Self-sufficient habitation unit — no external infrastructure required. Like a Mars habitat, but on Earth.</div>
+
+        <!-- SVG Diagram -->
+        <div class="sap-diagram">
+          <svg viewBox="0 0 800 420" width="100%" style="max-width:760px;">
+            <!-- Ground -->
+            <rect x="0" y="340" width="800" height="80" fill="#1a2a18" rx="0"/>
+            <rect x="0" y="335" width="800" height="8" fill="#2d4a25" rx="2"/>
+
+            <!-- Foundation / underground -->
+            <rect x="160" y="340" width="480" height="60" fill="#1e293b" stroke="#334155" stroke-width="1.5" rx="4"/>
+            <text x="400" y="375" text-anchor="middle" fill="#64748b" font-size="11" font-family="JetBrains Mono">Geothermal + Water recycling + Battery storage</text>
+
+            <!-- Main structure -->
+            <rect x="170" y="140" width="460" height="200" fill="#1e293b" stroke="#475569" stroke-width="2" rx="8"/>
+
+            <!-- Roof / Solar panels -->
+            <polygon points="150,140 400,50 650,140" fill="#1e3a5f" stroke="#3b82f6" stroke-width="2"/>
+            <rect x="220" y="80" width="70" height="45" fill="#2563eb" stroke="#3b82f6" stroke-width="1" rx="2" transform="rotate(-15,255,102)"/>
+            <rect x="310" y="65" width="70" height="45" fill="#2563eb" stroke="#3b82f6" stroke-width="1" rx="2" transform="rotate(-5,345,87)"/>
+            <rect x="420" y="65" width="70" height="45" fill="#2563eb" stroke="#3b82f6" stroke-width="1" rx="2" transform="rotate(5,455,87)"/>
+            <rect x="510" y="80" width="70" height="45" fill="#2563eb" stroke="#3b82f6" stroke-width="1" rx="2" transform="rotate(15,545,102)"/>
+
+            <!-- Solar label -->
+            <line x1="400" y1="52" x2="400" y2="20" stroke="#3b82f6" stroke-width="1" stroke-dasharray="3,3"/>
+            <text x="400" y="14" text-anchor="middle" fill="#3b82f6" font-size="10" font-weight="bold" font-family="JetBrains Mono">SOLAR ARRAY 32m² → 10,000 kWh/yr</text>
+
+            <!-- Rooms inside -->
+            <!-- Living area -->
+            <rect x="185" y="155" width="140" height="90" fill="#1a2744" stroke="#334155" stroke-width="1" rx="4"/>
+            <text x="255" y="195" text-anchor="middle" fill="#94a3b8" font-size="10">Living</text>
+            <text x="255" y="210" text-anchor="middle" fill="#64748b" font-size="8">+ AI assistant</text>
+
+            <!-- Kitchen / Food -->
+            <rect x="340" y="155" width="130" height="90" fill="#1a2e2a" stroke="#10b981" stroke-width="1" rx="4"/>
+            <text x="405" y="190" text-anchor="middle" fill="#10b981" font-size="10">Food System</text>
+            <text x="405" y="205" text-anchor="middle" fill="#64748b" font-size="8">Vertical farm</text>
+            <text x="405" y="218" text-anchor="middle" fill="#64748b" font-size="8">+ 3D food printer</text>
+
+            <!-- Fabrication -->
+            <rect x="485" y="155" width="130" height="90" fill="#2a1a2e" stroke="#a855f7" stroke-width="1" rx="4"/>
+            <text x="550" y="190" text-anchor="middle" fill="#a855f7" font-size="10">Fabrication</text>
+            <text x="550" y="205" text-anchor="middle" fill="#64748b" font-size="8">3D printer</text>
+            <text x="550" y="218" text-anchor="middle" fill="#64748b" font-size="8">+ recycler</text>
+
+            <!-- Bedrooms -->
+            <rect x="185" y="258" width="200" height="68" fill="#1a2235" stroke="#334155" stroke-width="1" rx="4"/>
+            <text x="285" y="297" text-anchor="middle" fill="#94a3b8" font-size="10">Private quarters (modular)</text>
+
+            <!-- Medical / Health -->
+            <rect x="400" y="258" width="100" height="68" fill="#2a1a1e" stroke="#ef4444" stroke-width="1" rx="4"/>
+            <text x="450" y="290" text-anchor="middle" fill="#ef4444" font-size="10">Health</text>
+            <text x="450" y="305" text-anchor="middle" fill="#64748b" font-size="8">AI diagnostics</text>
+
+            <!-- Comms -->
+            <rect x="515" y="258" width="100" height="68" fill="#1e293b" stroke="#f59e0b" stroke-width="1" rx="4"/>
+            <text x="565" y="290" text-anchor="middle" fill="#f59e0b" font-size="10">Comms</text>
+            <text x="565" y="305" text-anchor="middle" fill="#64748b" font-size="8">Starlink/mesh</text>
+
+            <!-- Water system arrow -->
+            <line x1="140" y1="200" x2="170" y2="200" stroke="#06b6d4" stroke-width="2" marker-end="url(#arrowCyan)"/>
+            <text x="65" y="195" text-anchor="middle" fill="#06b6d4" font-size="9" font-weight="bold">RAIN</text>
+            <text x="65" y="208" text-anchor="middle" fill="#06b6d4" font-size="9">HARVEST</text>
+
+            <!-- Drone pad -->
+            <rect x="670" y="290" width="60" height="45" fill="#1e293b" stroke="#f59e0b" stroke-width="1.5" rx="20"/>
+            <text x="700" y="310" text-anchor="middle" fill="#f59e0b" font-size="8" font-weight="bold">DRONE</text>
+            <text x="700" y="322" text-anchor="middle" fill="#f59e0b" font-size="8">PAD</text>
+            <line x1="650" y1="312" x2="670" y2="312" stroke="#f59e0b" stroke-width="1" stroke-dasharray="3,3"/>
+
+            <!-- Road connection -->
+            <rect x="670" y="350" width="120" height="20" fill="#374151" rx="2"/>
+            <text x="730" y="364" text-anchor="middle" fill="#9ca3af" font-size="8">→ Collector road</text>
+
+            <!-- Arrow markers -->
+            <defs>
+              <marker id="arrowCyan" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+                <polygon points="0,0 8,3 0,6" fill="#06b6d4"/>
+              </marker>
+            </defs>
+          </svg>
+        </div>
+
+        <!-- Specs cards -->
+        <div class="sap-grid">
+          <div class="sap-card">
+            <h3><span class="sap-icon">⚡</span> Energy System</h3>
+            <p>Rooftop solar array with integrated battery storage. Sized for complete energy independence at any latitude above 25°.</p>
+            <div class="spec">
+              <table class="sap-specs-table">
+                <tr><td>Solar panel area</td><td>32–50 m²</td></tr>
+                <tr><td>Annual generation</td><td>7,000–14,000 kWh</td></tr>
+                <tr><td>Battery capacity</td><td>40–80 kWh (3–7 day buffer)</td></tr>
+                <tr><td>Backup</td><td>Small wind turbine optional</td></tr>
+              </table>
+            </div>
+          </div>
+
+          <div class="sap-card">
+            <h3><span class="sap-icon">💧</span> Water System</h3>
+            <p>Closed-loop water cycle: rainwater harvesting, greywater recycling, atmospheric water generation. 80–90% recovery rate.</p>
+            <div class="spec">
+              <table class="sap-specs-table">
+                <tr><td>Daily consumption</td><td>200–400 L (family of 4)</td></tr>
+                <tr><td>Recycling rate κ<sub>W</sub></td><td>0.85</td></tr>
+                <tr><td>External input needed</td><td>30–60 L/day (rain)</td></tr>
+                <tr><td>Storage</td><td>5,000–10,000 L tank</td></tr>
+              </table>
+            </div>
+          </div>
+
+          <div class="sap-card">
+            <h3><span class="sap-icon">🌱</span> Food Production</h3>
+            <p>Vertical hydroponic farm for vegetables and greens. 3D food printer for proteins and complex dishes. Supplemented by drone delivery of bulk staples.</p>
+            <div class="spec">
+              <table class="sap-specs-table">
+                <tr><td>On-site production α<sub>F</sub></td><td>0.30–0.60</td></tr>
+                <tr><td>Growing area</td><td>15–30 m² vertical</td></tr>
+                <tr><td>Yield Φ</td><td>3,000–5,000 kcal/m²/yr</td></tr>
+                <tr><td>External food delivery</td><td>1–2× per month (drone/road)</td></tr>
+              </table>
+            </div>
+          </div>
+
+          <div class="sap-card">
+            <h3><span class="sap-icon">🔧</span> Fabrication &amp; Recycling</h3>
+            <p>Multi-material 3D printer for household objects, clothing, tools, replacement parts. Integrated recycler converts waste back to feedstock.</p>
+            <div class="spec">
+              <table class="sap-specs-table">
+                <tr><td>Material recursivity μ<sub>M</sub></td><td>0.85</td></tr>
+                <tr><td>External feedstock</td><td>~75 kg/year</td></tr>
+                <tr><td>Print materials</td><td>Polymer, metal, ceramic, bio</td></tr>
+                <tr><td>Self-repair coefficient σ</td><td>0.3–0.5 (self-healing surfaces)</td></tr>
+              </table>
+            </div>
+          </div>
+
+          <div class="sap-card">
+            <h3><span class="sap-icon">🏥</span> Health Monitoring</h3>
+            <p>AI-powered diagnostics, biometric sensors, telemedicine link to specialists. Autonomous first-aid and pharmacy module.</p>
+            <div class="spec">
+              <table class="sap-specs-table">
+                <tr><td>Health autonomy α<sub>H</sub></td><td>0.70</td></tr>
+                <tr><td>Diagnostics</td><td>AI + vital signs + blood analysis</td></tr>
+                <tr><td>Pharmacy</td><td>3D-printed medications (basic)</td></tr>
+                <tr><td>Emergency</td><td>Drone medevac to hospital</td></tr>
+              </table>
+            </div>
+          </div>
+
+          <div class="sap-card">
+            <h3><span class="sap-icon">📡</span> Communications</h3>
+            <p>Satellite internet (Starlink-class), mesh networking between clusters, local AI computing. Full informational sovereignty.</p>
+            <div class="spec">
+              <table class="sap-specs-table">
+                <tr><td>Informational autonomy α<sub>I</sub></td><td>1.00</td></tr>
+                <tr><td>Bandwidth</td><td>100+ Mbps satellite</td></tr>
+                <tr><td>Mesh network</td><td>Cluster-level redundancy</td></tr>
+                <tr><td>Local compute</td><td>Edge AI for autonomy</td></tr>
+              </table>
+            </div>
+          </div>
+
+          <div class="sap-card sap-full">
+            <h3><span class="sap-icon">📐</span> Physical Specifications</h3>
+            <p>Modular prefabricated construction. Transportable by standard truck. Deployable in 48–72 hours on any flat terrain. No foundation required — adjustable levelling feet. Designed for 50+ year lifespan with self-repairing surfaces.</p>
+            <div class="spec">
+              <table class="sap-specs-table">
+                <tr><td>Single occupant</td><td>≥ 30 m² floor area</td></tr>
+                <tr><td>Couple / small family</td><td>40–60 m²</td></tr>
+                <tr><td>Family with children</td><td>≥ 80 m²</td></tr>
+                <tr><td>Construction</td><td>Prefab modules, bolt assembly</td></tr>
+                <tr><td>Transport</td><td>1–2 standard truck loads</td></tr>
+                <tr><td>Deployment time</td><td>48–72 hours</td></tr>
+                <tr><td>External infrastructure required</td><td>None (road access recommended)</td></tr>
+                <tr><td>External dependency δ</td><td>0.05–0.15 (vs. 0.95 urban apt)</td></tr>
+                <tr><td>Composite autonomy score A</td><td>0.75–0.90</td></tr>
+                <tr><td>Bulk manufacturing cost</td><td>$10K–$15K per unit</td></tr>
+                <tr><td>Retail (single unit)</td><td>$50K–$120K</td></tr>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:20px; padding:14px; background:var(--bg3); border:1px solid var(--border); border-radius:8px; font-size:0.75rem; color:var(--text2); line-height:1.6;">
+          <strong style="color:var(--accent);">The Smartphone Analogy:</strong> Just as the smartphone consolidated dozens of separate devices into a single integrated platform, the SAP consolidates the functions of an entire urban infrastructure — power plant, water treatment, waste processing, food production, medical clinic, fabrication workshop — into a single mass-producible unit. No water mains. No sewer lines. No power grid. No roads required (recommended for supply logistics). Like a Mars habitat, but with the advantage of Earth's atmosphere, gravity, and solar irradiance.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  event.target.classList.add('active');
+  if (tab === 'map') setTimeout(() => update(), 50);
+}
+
+const CITIES = [
+  { name: "Miami", state: "FL", pop: 6200000, atRisk: 4100000, elev: 1.8, area: 143, coastAngle: 100, hwAngles: [280, 315, 350] },
+  { name: "New York City", state: "NY", pop: 8300000, atRisk: 2200000, elev: 3.0, area: 783, coastAngle: 120, hwAngles: [300, 340, 10] },
+  { name: "New Orleans", state: "LA", pop: 390000, atRisk: 350000, elev: -0.5, area: 907, coastAngle: 160, hwAngles: [280, 320, 350] },
+  { name: "Houston", state: "TX", pop: 2300000, atRisk: 800000, elev: 15, area: 1739, coastAngle: 145, hwAngles: [300, 340, 20] },
+  { name: "Tampa", state: "FL", pop: 400000, atRisk: 280000, elev: 3.0, area: 306, coastAngle: 210, hwAngles: [30, 60, 90] },
+  { name: "Charleston", state: "SC", pop: 155000, atRisk: 110000, elev: 2.4, area: 350, coastAngle: 135, hwAngles: [290, 315, 345] },
+  { name: "Norfolk", state: "VA", pop: 238000, atRisk: 150000, elev: 2.1, area: 250, coastAngle: 130, hwAngles: [270, 310, 340] },
+  { name: "Savannah", state: "GA", pop: 150000, atRisk: 95000, elev: 2.8, area: 280, coastAngle: 110, hwAngles: [270, 300, 330] },
+  { name: "Atlantic City", state: "NJ", pop: 40000, atRisk: 35000, elev: 1.5, area: 44, coastAngle: 90, hwAngles: [270, 300] },
+  { name: "Galveston", state: "TX", pop: 53000, atRisk: 48000, elev: 1.5, area: 120, coastAngle: 150, hwAngles: [310, 340] },
+  { name: "Honolulu", state: "HI", pop: 350000, atRisk: 180000, elev: 3.5, area: 272, coastAngle: 200, hwAngles: [350, 30] },
+  { name: "San Francisco", state: "CA", pop: 870000, atRisk: 160000, elev: 3.2, area: 121, coastAngle: 240, hwAngles: [0, 30, 120] }
+];
+
+let currentCity = CITIES[0];
+let canvas, ctx, W, H;
+
+// Init presets
+const presetsEl = document.getElementById('presets');
+CITIES.forEach((c, i) => {
+  const btn = document.createElement('button');
+  btn.className = 'preset-btn' + (i === 0 ? ' active' : '');
+  btn.innerHTML = `<span class="city-name">${c.name}, ${c.state}</span><span class="city-info">Pop ${(c.pop/1e6).toFixed(1)}M · ${(c.atRisk/1e3).toFixed(0)}K at risk</span>`;
+  btn.onclick = () => selectCity(i);
+  presetsEl.appendChild(btn);
+});
+
+function selectCity(i) {
+  currentCity = CITIES[i];
+  document.querySelectorAll('.preset-btn').forEach((b, j) => b.classList.toggle('active', j === i));
+  update();
+}
+
+// Sliders
+const sliders = ['slr','resRate','unitCost','clusterSize','corridor','spacing','pph','yearSlider'];
+sliders.forEach(id => document.getElementById(id).addEventListener('input', update));
+
+function getParams() {
+  return {
+    slr: +document.getElementById('slr').value,
+    resRate: +document.getElementById('resRate').value / 100,
+    unitCost: +document.getElementById('unitCost').value * 1000,
+    clusterSize: +document.getElementById('clusterSize').value,
+    corridor: +document.getElementById('corridor').value,
+    spacing: +document.getElementById('spacing').value,
+    pph: +document.getElementById('pph').value,
+    year: +document.getElementById('yearSlider').value
+  };
+}
+
+function compute(city, p) {
+  const yearsFromNow = p.year - 2026;
+  const totalYears = 2100 - 2026;
+  const slrNow = p.slr * (yearsFromNow / totalYears);
+  const atRiskFrac = Math.min(1, slrNow / Math.max(city.elev + p.slr, 0.1));
+  const popAtRisk = Math.round(city.atRisk * Math.min(1, (slrNow + 0.5) / (city.elev + p.slr)));
+  const resettled = Math.round(city.atRisk * (1 - Math.pow(1 - p.resRate, yearsFromNow)));
+  const remaining = Math.max(0, popAtRisk - resettled);
+  const homesNeeded = Math.ceil(resettled / p.pph);
+  const clustersNeeded = Math.ceil(homesNeeded / p.clusterSize);
+  const clustersPerSide = Math.ceil(clustersNeeded / (city.hwAngles.length * 2));
+  const corridorCapacity = Math.floor(p.corridor / p.spacing) * 2 * city.hwAngles.length;
+  const totalClusters = Math.min(clustersNeeded, corridorCapacity);
+  const totalHomes = totalClusters * p.clusterSize;
+  const totalResettled = Math.min(resettled, totalHomes * p.pph);
+  const totalCost = totalHomes * p.unitCost;
+  const roadKm = totalClusters * p.spacing * 0.3 + p.corridor * city.hwAngles.length;
+  const newDensity = totalResettled / (p.corridor * p.spacing * city.hwAngles.length * 2);
+  const origDensity = city.pop / city.area;
+  const annualCost = totalCost / Math.max(1, yearsFromNow);
+  const completionYear = Math.min(2100, 2026 + Math.ceil(Math.log(1 - city.atRisk * 0.95 / (city.atRisk || 1)) / Math.log(1 - p.resRate)));
+
+  return {
+    slrNow, popAtRisk, resettled: totalResettled, remaining,
+    homesNeeded: totalHomes, clustersNeeded: totalClusters,
+    totalCost, annualCost, roadKm, newDensity, origDensity,
+    corridorCapacity, completionYear, atRiskFrac, totalYears,
+    yearsFromNow, clustersPerSide
+  };
+}
+
+function formatNum(n) {
+  if (n >= 1e6) return (n/1e6).toFixed(1) + 'M';
+  if (n >= 1e3) return (n/1e3).toFixed(0) + 'K';
+  return n.toFixed(0);
+}
+function formatMoney(n) {
+  if (n >= 1e9) return '$' + (n/1e9).toFixed(1) + 'B';
+  if (n >= 1e6) return '$' + (n/1e6).toFixed(0) + 'M';
+  return '$' + (n/1e3).toFixed(0) + 'K';
+}
+
+function update() {
+  const p = getParams();
+  document.getElementById('slrVal').textContent = p.slr.toFixed(1) + ' m';
+  document.getElementById('resRateVal').textContent = (p.resRate*100).toFixed(1) + '%';
+  document.getElementById('unitCostVal').textContent = '$' + (p.unitCost/1000) + 'K';
+  document.getElementById('clusterSizeVal').textContent = p.clusterSize;
+  document.getElementById('corridorVal').textContent = p.corridor + ' km';
+  document.getElementById('spacingVal').textContent = p.spacing.toFixed(1) + ' km';
+  document.getElementById('pphVal').textContent = p.pph.toFixed(1);
+  document.getElementById('yearVal').textContent = p.year;
+
+  const r = compute(currentCity, p);
+
+  document.getElementById('infoBar').innerHTML =
+    `<div class="city-title">${currentCity.name}, ${currentCity.state}</div>` +
+    `<div style="font-size:0.7rem;color:var(--text2)">` +
+    `Pop: ${formatNum(currentCity.pop)} · At risk: ${formatNum(currentCity.atRisk)} · ` +
+    `Avg elev: ${currentCity.elev}m · Year: ${p.year}</div>`;
+
+  const safeClass = r.remaining <= 0 ? 'green' : r.remaining < currentCity.atRisk * 0.3 ? 'yellow' : 'red';
+  document.getElementById('results').innerHTML = [
+    ['Sea-level rise (current year)', `<span class="value blue">${r.slrNow.toFixed(2)} m</span>`],
+    ['Population at risk', `<span class="value ${r.popAtRisk > 100000 ? 'red' : 'yellow'}">${formatNum(r.popAtRisk)}</span>`],
+    ['Resettled so far', `<span class="value green">${formatNum(r.resettled)}</span>`],
+    ['Still remaining', `<span class="value ${safeClass}">${formatNum(r.remaining)}</span>`],
+    ['Autonomous homes built', `<span class="value blue">${formatNum(r.homesNeeded)}</span>`],
+    ['Clusters deployed', `<span class="value blue">${r.clustersNeeded}</span>`],
+    ['Corridor capacity', `<span class="value">${r.corridorCapacity} clusters</span>`],
+    ['Total infrastructure cost', `<span class="value yellow">${formatMoney(r.totalCost)}</span>`],
+    ['Annual cost', `<span class="value">${formatMoney(r.annualCost)}/yr</span>`],
+    ['Road network', `<span class="value">${r.roadKm.toFixed(0)} km</span>`],
+    ['Est. completion year', `<span class="value ${r.completionYear <= 2080 ? 'green' : 'yellow'}">${Math.min(r.completionYear, 2100)}</span>`]
+  ].map(([l,v]) => `<div class="result-row"><span class="label">${l}</span>${v}</div>`).join('');
+
+  const badge = r.newDensity < 100 ? '<span class="badge badge-safe">Below ρ*</span>' :
+                r.newDensity < 500 ? '<span class="badge badge-warn">Moderate</span>' :
+                '<span class="badge badge-danger">Above ρ*</span>';
+  document.getElementById('densityResults').innerHTML = [
+    ['Original city density', `<span class="value red">${r.origDensity.toFixed(0)}/km²</span>`],
+    ['New settlement density', `<span class="value green">${r.newDensity.toFixed(1)}/km²</span> ${badge}`],
+    ['Density reduction', `<span class="value green">${(r.origDensity/Math.max(r.newDensity,0.1)).toFixed(0)}×</span>`],
+    ['WMD casualty reduction', `<span class="value green">${(r.origDensity/Math.max(r.newDensity,0.1)).toFixed(0)}×</span>`],
+    ['Epidemic R₀ factor', `<span class="value green">÷${Math.pow(r.origDensity/Math.max(r.newDensity,0.1), 0.8).toFixed(1)}</span>`]
+  ].map(([l,v]) => `<div class="result-row"><span class="label">${l}</span>${v}</div>`).join('');
+
+  draw(r, p);
+}
+
+function draw(r, p) {
+  canvas = document.getElementById('canvas');
+  const rect = canvas.parentElement.getBoundingClientRect();
+  W = rect.width * 2; H = rect.height * 2;
+  canvas.width = W; canvas.height = H;
+  canvas.style.width = rect.width + 'px';
+  canvas.style.height = rect.height + 'px';
+  ctx = canvas.getContext('2d');
+
+  const cx = W * 0.45, cy = H * 0.48;
+  const scale = Math.min(W, H) * 0.0028;
+  const landR = 320 * scale;
+  const coastRad = currentCity.coastAngle * Math.PI / 180;
+  const coastSpan = 1.2; // half-angle of ocean sector
+
+  // ── 1. Background ──
+  ctx.fillStyle = '#0f1729';
+  ctx.fillRect(0, 0, W, H);
+
+  // ── 2. Land circle ──
+  ctx.fillStyle = '#1a2235';
+  ctx.beginPath();
+  ctx.arc(cx, cy, landR, 0, Math.PI * 2);
+  ctx.fill();
+
+  // ── 3. Ocean sector (draw first as base) ──
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(cx, cy);
+  ctx.arc(cx, cy, 400 * scale, coastRad - coastSpan, coastRad + coastSpan);
+  ctx.closePath();
+  ctx.fillStyle = '#0c1a3d';
+  ctx.fill();
+
+  // Water texture dots
+  for (let i = 0; i < 60; i++) {
+    const a = coastRad - coastSpan * 0.9 + Math.random() * coastSpan * 1.8;
+    const d = 50 + Math.random() * 300;
+    const wx = cx + Math.cos(a) * d * scale;
+    const wy = cy + Math.sin(a) * d * scale;
+    ctx.beginPath();
+    ctx.arc(wx, wy, (1 + Math.random() * 2) * scale, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(30,64,175,${0.15 + Math.random()*0.25})`;
+    ctx.fill();
+  }
+  ctx.restore();
+
+  // ── Pre-calculate city radius (needed by flood + clusters) ──
+  const cityR = Math.sqrt(currentCity.area) * 1.2 * scale;
+
+  // ── 4. Flood zone — red ellipse along coastline, grows with SLR ──
+  // floodFrac combines direct sea-level flooding with storm surge risk (from at-risk population)
+  const directFlood = r.slrNow > 0 ? Math.min(1, r.slrNow / Math.max(currentCity.elev + p.slr * 0.3, 0.2)) : 0;
+  const stormRiskBase = (currentCity.atRisk / currentCity.pop) * 0.15; // baseline from storm surge vulnerability
+  const yearProgress = (p.year - 2026) / (2100 - 2026);
+  const floodFrac = Math.min(1, directFlood + stormRiskBase * yearProgress);
+  if (floodFrac > 0) {
+    ctx.save();
+    ctx.translate(cx, cy);
+    // Rotate so the LONG axis is ALONG the coastline (perpendicular to coastRad)
+    ctx.rotate(coastRad + Math.PI / 2);
+
+    // Small ellipse: long axis along coast, short axis inland
+    const maxLong = landR * 0.45;  // along coastline
+    const maxShort = landR * 0.2; // depth inland
+    const elong = Math.max(10 * scale, maxLong * floodFrac);
+    const eshort = Math.max(5 * scale, maxShort * floodFrac);
+
+    // Outer glow
+    const grd = ctx.createRadialGradient(0, 0, 0, 0, 0, elong);
+    grd.addColorStop(0, 'rgba(239,68,68,0.55)');
+    grd.addColorStop(0.6, 'rgba(239,68,68,0.2)');
+    grd.addColorStop(1, 'rgba(239,68,68,0.0)');
+    ctx.beginPath();
+    ctx.ellipse(0, 0, elong, eshort, 0, 0, Math.PI * 2);
+    ctx.fillStyle = grd;
+    ctx.fill();
+
+    // Solid inner core
+    ctx.beginPath();
+    ctx.ellipse(0, 0, elong * 0.5, eshort * 0.5, 0, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(239,68,68,0.3)';
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+  // ── 5. City core glow ──
+  const grdCity = ctx.createRadialGradient(cx, cy, 0, cx, cy, cityR);
+  grdCity.addColorStop(0, 'rgba(148,163,184,0.25)');
+  grdCity.addColorStop(1, 'rgba(148,163,184,0.02)');
+  ctx.fillStyle = grdCity;
+  ctx.beginPath();
+  ctx.arc(cx, cy, cityR, 0, Math.PI * 2);
+  ctx.fill();
+
+  // City label
+  ctx.fillStyle = 'rgba(226,232,240,0.7)';
+  ctx.font = `${14 * scale}px 'DM Sans', sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.fillText(currentCity.name, cx, cy + cityR + 18 * scale);
+
+  // ── 6. Highways + clusters (drawn AFTER ellipse, grow with floodFrac) ──
+  // Clusters appear progressively: more clusters as flood grows
+  const clusterProgress = Math.max(floodFrac, 0.05); // at least a few even at start
+  currentCity.hwAngles.forEach((angle, hi) => {
+    const a = angle * Math.PI / 180;
+    const startD = cityR * 0.8;
+    const endD = (cityR + p.corridor * 1.8) * scale;
+
+    // Highway line — length grows with progress
+    
+    ctx.beginPath();
+    ctx.moveTo(cx + Math.cos(a) * startD, cy + Math.sin(a) * startD);
+    ctx.lineTo(cx + Math.cos(a) * endD, cy + Math.sin(a) * endD);
+    ctx.strokeStyle = 'rgba(245,158,11,0.5)';
+    ctx.lineWidth = 3 * scale;
+    ctx.stroke();
+
+    // Highway label
+    ctx.save();
+    ctx.fillStyle = 'rgba(245,158,11,0.6)';
+    ctx.font = `${8 * scale}px 'JetBrains Mono', monospace`;
+    ctx.textAlign = 'center';
+    const labelD = endD + 15 * scale;
+    ctx.fillText(`Hwy ${hi+1}`, cx + Math.cos(a) * labelD, cy + Math.sin(a) * labelD);
+    ctx.restore();
+
+    // Clusters on both sides — number grows with floodFrac
+    const maxPerSide = Math.min(r.clustersPerSide, Math.floor(p.corridor / p.spacing));
+    const visiblePerSide = Math.max(1, Math.ceil(maxPerSide * clusterProgress));
+    for (let side = -1; side <= 1; side += 2) {
+      for (let ci = 0; ci < visiblePerSide; ci++) {
+        const d = startD + (ci + 1) * p.spacing * 1.8 * scale;
+        if (d > endD) break;
+        const perp = a + side * Math.PI / 2;
+        const offD = 20 * scale;
+        const clx = cx + Math.cos(a) * d + Math.cos(perp) * offD;
+        const cly = cy + Math.sin(a) * d + Math.sin(perp) * offD;
+
+        // Collector road
+        const hx = cx + Math.cos(a) * d;
+        const hy = cy + Math.sin(a) * d;
+        ctx.beginPath();
+        ctx.moveTo(hx, hy);
+        ctx.lineTo(clx, cly);
+        ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+        ctx.lineWidth = 1.5 * scale;
+        ctx.stroke();
+
+        // Cluster circle
+        ctx.beginPath();
+        ctx.arc(clx, cly, 8 * scale, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(16,185,129,0.15)';
+        ctx.strokeStyle = 'rgba(16,185,129,0.5)';
+        ctx.lineWidth = 1 * scale;
+        ctx.fill(); ctx.stroke();
+
+        // Individual homes in cluster
+        for (let h = 0; h < p.clusterSize; h++) {
+          const ha = (h / p.clusterSize) * Math.PI * 2;
+          const hr = 5 * scale;
+          const hx2 = clx + Math.cos(ha) * hr;
+          const hy2 = cly + Math.sin(ha) * hr;
+          ctx.beginPath();
+          ctx.arc(hx2, hy2, 1.2 * scale, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(59,130,246,0.8)';
+          ctx.fill();
+        }
+      }
+    }
+  });
+
+  // ── 7. Subtle grid ──
+  ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+  ctx.lineWidth = 1;
+  for (let gx = 0; gx < W; gx += 60 * scale) { ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, H); ctx.stroke(); }
+  for (let gy = 0; gy < H; gy += 60 * scale) { ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(W, gy); ctx.stroke(); }
+}
+
+// Initial render
+function initCanvas() {
+  const mapArea = document.querySelector('.map-area');
+  const rect = mapArea.getBoundingClientRect();
+  canvas = document.getElementById('canvas');
+  canvas.style.width = rect.width + 'px';
+  canvas.style.height = rect.height + 'px';
+  update();
+}
+
+window.addEventListener('resize', () => update());
+window.addEventListener('load', initCanvas);
+</script>
+</body>
+</html>
