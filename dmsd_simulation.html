@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DMSD Interactive Simulation | Kriger 2026</title>
+<style>
+:root{--bg:#fafaf8;--bg2:#f1efe8;--fg:#2c2c2a;--fg2:#888780;--fg3:#b4b2a9;--border:rgba(0,0,0,0.1);--green:#1D9E75;--red:#E24B4A;--amber:#BA7517;--blue:#378ADD}
+@media(prefers-color-scheme:dark){:root{--bg:#1a1a18;--bg2:#2c2c2a;--fg:#e8e6de;--fg2:#b4b2a9;--fg3:#5f5e5a;--border:rgba(255,255,255,0.1)}}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--fg);line-height:1.6}
+.wrap{max-width:860px;margin:0 auto;padding:2rem 1.5rem}
+h1{font-size:22px;font-weight:500;margin:0 0 4px}
+h2{font-size:16px;font-weight:500;margin:1.5rem 0 .5rem}
+.sub{font-size:13px;color:var(--fg2);margin:0 0 1.5rem}
+.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:0 0 1.5rem}
+.ctrl{background:var(--bg2);border-radius:10px;padding:10px 14px}
+.ctrl label{font-size:12px;color:var(--fg2);display:block;margin:0 0 4px}
+.ctrl .row{display:flex;align-items:center;gap:8px}
+.ctrl input[type=range]{flex:1;height:4px;-webkit-appearance:none;appearance:none;background:var(--border);border-radius:2px;outline:none}
+.ctrl input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--fg);cursor:pointer}
+.ctrl .val{font-size:14px;font-weight:500;min-width:44px;text-align:right}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin:0 0 1.5rem}
+.m{background:var(--bg2);border-radius:8px;padding:8px 12px}
+.m .ml{font-size:11px;color:var(--fg2)}
+.m .mv{font-size:18px;font-weight:500}
+.panel{margin:0 0 12px}
+.ptitle{font-size:13px;font-weight:500;margin:0 0 4px;display:flex;align-items:center;gap:6px}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+canvas{width:100%;height:140px;display:block;border-radius:8px;border:.5px solid var(--border)}
+#cv-peri{height:180px}
+.sep{height:.5px;background:var(--border);margin:1.5rem 0}
+.info{font-size:13px;color:var(--fg2);line-height:1.7;margin:0 0 1rem}
+.info b{color:var(--fg);font-weight:500}
+.eq{font-family:'Times New Roman',Georgia,serif;font-size:15px;text-align:center;margin:1rem 0;padding:12px;background:var(--bg2);border-radius:8px}
+footer{margin:2rem 0 0;padding:1.5rem 0 0;border-top:.5px solid var(--border);font-size:12px;color:var(--fg3)}
+footer a{color:var(--blue);text-decoration:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Differential Multi-Star Decorrelation (DMSD)</h1>
+<p class="sub">Interactive simulation companion to: Kriger, B. (2026). Submitted to <i>Astronomische Nachrichten</i>, 19 March 2026.</p>
+<p class="info">The <b>host star B</b> contains a planetary RV signal, stellar jitter, and instrumental systematics. The <b>reference star A</b> shares the same systematics (scaled by &rho;) but has no planet. Regressing B against A removes the common-mode component.</p>
+<div class="eq">
+RV&#771;<sub>B</sub>(t) = RV<sub>B</sub>(t) &minus; &beta; &middot; RV<sub>A</sub>(t) &nbsp;&nbsp; | &nbsp;&nbsp; &eta; &asymp; 1/&radic;(1 &minus; &rho;&sup2;)
+</div>
+<div class="controls">
+  <div class="ctrl"><label>Planet semi-amplitude K</label><div class="row"><input type="range" min="0.05" max="2" value="0.47" step="0.01" id="sl-K" oninput="run()"><span class="val" id="v-K">0.47 m/s</span></div></div>
+  <div class="ctrl"><label>Stellar jitter (host B)</label><div class="row"><input type="range" min="0.1" max="5" value="1.5" step="0.1" id="sl-jit" oninput="run()"><span class="val" id="v-jit">1.5 m/s</span></div></div>
+  <div class="ctrl"><label>Systematic amplitude</label><div class="row"><input type="range" min="0.02" max="1" value="0.30" step="0.01" id="sl-sys" oninput="run()"><span class="val" id="v-sys">0.30 m/s</span></div></div>
+  <div class="ctrl"><label>Common-mode fraction &rho;</label><div class="row"><input type="range" min="0" max="0.99" value="0.85" step="0.01" id="sl-rho" oninput="run()"><span class="val" id="v-rho">0.85</span></div></div>
+</div>
+<div class="metrics" id="metrics"></div>
+<div class="panel"><div class="ptitle"><span class="dot" style="background:var(--red)"></span> Raw RV of host star B</div><canvas id="cv-raw"></canvas></div>
+<div class="panel"><div class="ptitle"><span class="dot" style="background:var(--amber)"></span> Reference star A</div><canvas id="cv-ref"></canvas></div>
+<div class="panel"><div class="ptitle"><span class="dot" style="background:var(--green)"></span> DMSD-corrected RV of B</div><canvas id="cv-dmsd"></canvas></div>
+<div class="sep"></div>
+<h2>Lomb&ndash;Scargle periodogram</h2>
+<p class="info">Dashed red: raw. Solid green: DMSD-corrected. Vertical line: true planet period (P = 2.1 yr).</p>
+<canvas id="cv-peri"></canvas>
+<div class="sep"></div>
+<h2>How it works</h2>
+<p class="info">In a resolved triple system like Polaris, stars A and B are observed on the same spectrograph within minutes. Instrumental drifts, calibration lamp aging, and focus changes affect both stars similarly. These <b>common-mode systematics</b> create false periodogram peaks at ~1 yr. DMSD removes them by OLS regression of RV<sub>B</sub> against RV<sub>A</sub>.</p>
+<p class="info">Try &rho; = 0 (no improvement) vs &rho; = 0.95 (strong suppression). Increase systematic amplitude to see alias peaks.</p>
+<footer>
+B. Kriger | Information Physics Institute<br>
+ORCID: <a href="https://orcid.org/0009-0001-0034-2903">0009-0001-0034-2903</a> | CC-BY 4.0
+</footer>
+</div>
+<script>
+(function(){
+var dk=window.matchMedia('(prefers-color-scheme:dark)').matches;
+var cG=dk?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.06)';
+var cT=dk?'#b4b2a9':'#888780';
+var cR=dk?'#F09595':'#E24B4A';
+var cA=dk?'#FAC775':'#BA7517';
+var cD=dk?'#5DCAA5':'#1D9E75';
+var NN=120,TT=5,ddt=TT/NN,Pp=2.1;
+function srng(s){return function(){s=(s*16807)%2147483647;return s/2147483647;};}
+var r1=srng(42),r2=srng(137),r3=srng(999),r4=srng(2025);
+var nB=[],nA=[],sD=[],sC=[];
+for(var i=0;i<NN;i++){
+  nB.push((r1()-0.5)*2);
+  nA.push((r2()-0.5)*2);
+  sD.push((r4()-0.5)*2);
+  var tt=i*ddt;
+  sC.push(Math.sin(2*Math.PI*tt)*0.6+Math.sin(2*Math.PI*tt/0.5)*0.25+Math.sin(2*Math.PI*tt/2.3)*0.15+(r3()-0.5)*0.1);
+}
+function setup(id){
+  var c=document.getElementById(id),ctx=c.getContext('2d');
+  var dpr=window.devicePixelRatio||1,r=c.getBoundingClientRect();
+  c.width=r.width*dpr;c.height=r.height*dpr;ctx.scale(dpr,dpr);
+  return{ctx:ctx,W:r.width,H:r.height};
+}
+function drawTS(id,data,col,yR){
+  var s=setup(id),ctx=s.ctx,W=s.W,H=s.H;
+  var p={l:48,r:10,t:10,b:22},pw=W-p.l-p.r,ph=H-p.t-p.b;
+  ctx.clearRect(0,0,W,H);
+  for(var i=0;i<=4;i++){
+    var y=p.t+ph*i/4;
+    ctx.strokeStyle=cG;ctx.lineWidth=0.5;ctx.beginPath();ctx.moveTo(p.l,y);ctx.lineTo(W-p.r,y);ctx.stroke();
+    var v=yR-2*yR*i/4;
+    ctx.fillStyle=cT;ctx.font='11px -apple-system,sans-serif';ctx.textAlign='right';ctx.fillText(v.toFixed(1),p.l-4,y+4);
+  }
+  ctx.strokeStyle=col;ctx.lineWidth=1;ctx.globalAlpha=0.4;ctx.beginPath();
+  for(var i=0;i<data.length;i++){
+    var x=p.l+(i/(data.length-1))*pw;
+    var y=p.t+ph/2-(data[i]/yR)*(ph/2);
+    if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+  }
+  ctx.stroke();ctx.globalAlpha=1.0;
+  ctx.fillStyle=col;
+  for(var i=0;i<data.length;i++){
+    var x=p.l+(i/(data.length-1))*pw;
+    var y=p.t+ph/2-(data[i]/yR)*(ph/2);
+    ctx.beginPath();ctx.arc(x,y,2.2,0,2*Math.PI);ctx.fill();
+  }
+  ctx.fillStyle=cT;ctx.font='11px -apple-system,sans-serif';ctx.textAlign='center';
+  ctx.fillText('Time (years)',W/2,H-2);
+}
+function lombScargle(data,freqs){
+  var n=data.length,mn=0;
+  for(var i=0;i<n;i++)mn+=data[i];mn/=n;
+  var pw=[];
+  for(var fi=0;fi<freqs.length;fi++){
+    var f=freqs[fi],sc=0,ss=0,cc=0,s0=0;
+    for(var i=0;i<n;i++){
+      var t=i*ddt,ph=2*Math.PI*f*t,sv=Math.sin(ph),cv=Math.cos(ph),d=data[i]-mn;
+      sc+=d*cv;ss+=d*sv;cc+=cv*cv;s0+=sv*sv;
+    }
+    var v=0;if(cc>0)v+=sc*sc/cc;if(s0>0)v+=ss*ss/s0;
+    pw.push(v/n);
+  }
+  return pw;
+}
+function drawPeri(rP,dP,freqs){
+  var s=setup('cv-peri'),ctx=s.ctx,W=s.W,H=s.H;
+  var p={l:48,r:10,t:14,b:28},pw=W-p.l-p.r,ph=H-p.t-p.b;
+  ctx.clearRect(0,0,W,H);
+  var mx=0;
+  for(var i=0;i<rP.length;i++){if(rP[i]>mx)mx=rP[i];if(dP[i]>mx)mx=dP[i];}
+  mx*=1.15;
+  for(var i=0;i<=4;i++){
+    var y=p.t+ph*i/4;ctx.strokeStyle=cG;ctx.lineWidth=0.5;ctx.beginPath();ctx.moveTo(p.l,y);ctx.lineTo(W-p.r,y);ctx.stroke();
+  }
+  var pds=[];for(var i=0;i<freqs.length;i++)pds.push(1/freqs[i]);
+  var pMn=pds[pds.length-1],pMx=pds[0];
+  // true period line
+  var tx=p.l+((Pp-pMn)/(pMx-pMn))*pw;
+  ctx.strokeStyle=dk?'rgba(255,255,255,0.2)':'rgba(0,0,0,0.12)';
+  ctx.setLineDash([4,3]);ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(tx,p.t);ctx.lineTo(tx,p.t+ph);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle=cT;ctx.font='11px -apple-system,sans-serif';ctx.textAlign='center';ctx.fillText('P=2.1yr',tx,p.t+ph+14);
+  // 1yr line
+  var ox=p.l+((1.0-pMn)/(pMx-pMn))*pw;
+  ctx.strokeStyle=dk?'rgba(255,255,255,0.1)':'rgba(0,0,0,0.07)';
+  ctx.setLineDash([2,4]);ctx.beginPath();ctx.moveTo(ox,p.t);ctx.lineTo(ox,p.t+ph);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillText('1yr',ox,p.t+ph+14);
+  function pl(data,color,lw,dash){
+    ctx.strokeStyle=color;ctx.lineWidth=lw;if(dash)ctx.setLineDash(dash);
+    ctx.beginPath();
+    for(var i=0;i<data.length;i++){
+      var x=p.l+((pds[i]-pMn)/(pMx-pMn))*pw;
+      var y=p.t+ph-(data[i]/mx)*ph;
+      if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+    }
+    ctx.stroke();ctx.setLineDash([]);
+  }
+  pl(rP,cR,1.2,[5,3]);pl(dP,cD,2,null);
+  // legend
+  var lx=W-170;
+  ctx.setLineDash([5,3]);ctx.strokeStyle=cR;ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(lx,p.t+5);ctx.lineTo(lx+16,p.t+5);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle=cT;ctx.textAlign='left';ctx.fillText('Raw RV',lx+22,p.t+9);
+  ctx.strokeStyle=cD;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(lx,p.t+20);ctx.lineTo(lx+16,p.t+20);ctx.stroke();
+  ctx.fillText('DMSD-corrected',lx+22,p.t+24);
+  ctx.fillStyle=cT;ctx.textAlign='center';ctx.fillText('Period (years)',W/2,H-4);
+}
+window.run=function(){
+  var K=parseFloat(document.getElementById('sl-K').value);
+  var jit=parseFloat(document.getElementById('sl-jit').value);
+  var sys=parseFloat(document.getElementById('sl-sys').value);
+  var rho=parseFloat(document.getElementById('sl-rho').value);
+  document.getElementById('v-K').textContent=K.toFixed(2)+' m/s';
+  document.getElementById('v-jit').textContent=jit.toFixed(1)+' m/s';
+  document.getElementById('v-sys').textContent=sys.toFixed(2)+' m/s';
+  document.getElementById('v-rho').textContent=rho.toFixed(2);
+  var rawB=[],refA=[],dmB=[];
+  for(var i=0;i<NN;i++){
+    var t=i*ddt;
+    var pl=K*Math.sin(2*Math.PI*t/Pp);
+    var ji=nB[i]*jit;
+    var cm=sC[i]*sys;
+    var df=sD[i]*sys*(1-rho);
+    rawB.push(pl+ji+cm+df);
+    refA.push(cm*rho+nA[i]*2.0+sD[i]*sys*0.05);
+  }
+  var mB=0,mR=0;
+  for(var i=0;i<NN;i++){mB+=rawB[i];mR+=refA[i];}
+  mB/=NN;mR/=NN;
+  var cov=0,vr=0;
+  for(var i=0;i<NN;i++){cov+=(rawB[i]-mB)*(refA[i]-mR);vr+=(refA[i]-mR)*(refA[i]-mR);}
+  var beta=vr>0?cov/vr:0;
+  for(var i=0;i<NN;i++)dmB.push(rawB[i]-beta*(refA[i]-mR));
+  var ssR=0,ssD=0;
+  for(var i=0;i<NN;i++){ssR+=rawB[i]*rawB[i];ssD+=dmB[i]*dmB[i];}
+  var rmsR=Math.sqrt(ssR/NN),rmsD=Math.sqrt(ssD/NN);
+  var etaTh=rho<0.995?(1/Math.sqrt(1-rho*rho)).toFixed(1):'>10';
+  var etaM=rmsD>0.01?(rmsR/rmsD).toFixed(1):'>10';
+  var freqs=[];for(var f=0.15;f<=3;f+=0.015)freqs.push(f);
+  var rP=lombScargle(rawB,freqs),dP=lombScargle(dmB,freqs);
+  var tI=0,bd=999;
+  for(var i=0;i<freqs.length;i++){var d=Math.abs(freqs[i]-1/Pp);if(d<bd){bd=d;tI=i;}}
+  var mxR=0,mxD=0;
+  for(var i=0;i<rP.length;i++){
+    var per=1/freqs[i];
+    if(Math.abs(per-Pp)>0.1*Pp){if(rP[i]>mxR)mxR=rP[i];if(dP[i]>mxD)mxD=dP[i];}
+  }
+  var aliasR=mxR>rP[tI],aliasD=mxD>dP[tI];
+  document.getElementById('metrics').innerHTML=
+    '<div class="m"><div class="ml">RMS raw</div><div class="mv">'+rmsR.toFixed(2)+' m/s</div></div>'+
+    '<div class="m"><div class="ml">RMS DMSD</div><div class="mv" style="color:var(--green)">'+rmsD.toFixed(2)+' m/s</div></div>'+
+    '<div class="m"><div class="ml">&eta; measured</div><div class="mv">'+etaM+'&times;</div></div>'+
+    '<div class="m"><div class="ml">&eta; theory</div><div class="mv">'+etaTh+'&times;</div></div>'+
+    '<div class="m"><div class="ml">&beta; (OLS)</div><div class="mv">'+beta.toFixed(3)+'</div></div>'+
+    '<div class="m"><div class="ml">Alias dominates?</div><div class="mv" style="color:'+(aliasR?'var(--red)':'var(--green)')+'">Raw:'+(aliasR?' YES':' no')+' | DMSD:'+(aliasD?' YES':' no')+'</div></div>';
+  var yR=Math.max(rmsR*2.5,K*3,2);
+  drawTS('cv-raw',rawB,cR,yR);
+  var mxA=0;for(var i=0;i<refA.length;i++){var a=Math.abs(refA[i]);if(a>mxA)mxA=a;}
+  drawTS('cv-ref',refA,cA,Math.max(mxA*1.3,1));
+  drawTS('cv-dmsd',dmB,cD,yR);
+  drawPeri(rP,dP,freqs);
+};
+window.addEventListener('load',run);
+window.addEventListener('resize',run);
+})();
+</script>
+</body>
+</html>
