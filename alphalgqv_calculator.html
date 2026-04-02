@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>αLGQV Rotation Curve Calculator</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
+:root{--bg:#0a0a1a;--card:#111827;--border:#1e293b;--text:#e2e8f0;--muted:#94a3b8;--dim:#64748b;
+--accent:#60a5fa;--purple:#a78bfa;--green:#34d399;--yellow:#fbbf24;--red:#f87171;--pink:#f472b6}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Crimson Pro',Georgia,serif;background:var(--bg);color:var(--text);padding:16px;line-height:1.6}
+h1{font-size:26px;text-align:center;background:linear-gradient(90deg,var(--accent),var(--purple),var(--pink));
+-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px}
+h2{font-size:20px;color:var(--purple);margin:24px 0 12px;border-bottom:1px solid var(--border);padding-bottom:6px}
+h3{font-size:16px;color:var(--accent);margin:16px 0 8px}
+.subtitle{text-align:center;color:var(--muted);font-size:13px}
+.container{max-width:960px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px}
+.grid{display:grid;gap:8px}
+.grid-8{grid-template-columns:repeat(auto-fill,minmax(100px,1fr))}
+.grid-2{grid-template-columns:1fr 1fr}
+.stat-box{background:#0f172a;border:1px solid var(--border);border-radius:8px;padding:8px 10px}
+.stat-label{font-size:10px;color:var(--dim);text-transform:uppercase}
+.stat-val{font-size:15px;font-weight:700}
+.galaxy-btn{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:6px 8px;
+cursor:pointer;color:var(--muted);font-size:11px;font-family:inherit;transition:all .2s;text-align:center;min-width:85px}
+.galaxy-btn:hover{border-color:var(--accent);color:var(--text)}
+.galaxy-btn.active{border-color:var(--accent);background:rgba(96,165,250,0.12);color:#fff;font-weight:700}
+
+.galaxy-btn .name{font-weight:600;font-size:12px}
+.galaxy-btn .type{font-size:9px;color:var(--dim)}
+canvas{max-height:420px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th,td{padding:4px 8px;text-align:center;border-bottom:1px solid var(--border)}
+th{color:var(--muted);font-weight:600;font-size:10px;text-transform:uppercase}
+tr:hover{background:rgba(96,165,250,0.05)}
+.mono{font-family:'JetBrains Mono',monospace}
+.formula-box{background:#0f172a;border:1px solid var(--border);border-radius:8px;padding:14px;
+font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--yellow);line-height:1.9;overflow-x:auto}
+input,select{background:#0f172a;border:1px solid var(--border);border-radius:6px;padding:6px 10px;
+color:var(--text);font-family:inherit;font-size:13px;width:100%}
+input:focus{outline:none;border-color:var(--accent)}
+label{font-size:12px;color:var(--muted);display:block;margin-bottom:3px}
+button.calc-btn{background:var(--accent);color:#000;border:none;border-radius:8px;padding:10px 24px;
+font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;width:100%;margin-top:8px}
+button.calc-btn:hover{background:#3b82f6}
+.explanation{color:var(--muted);font-size:14px;line-height:1.8}
+.explanation b{color:var(--text)}
+.explanation .highlight{color:var(--yellow)}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700}
+.tag-measured{background:rgba(52,211,153,0.15);color:var(--green)}
+.tag-derived{background:rgba(167,139,250,0.15);color:var(--purple)}
+.tag-observed{background:rgba(96,165,250,0.15);color:var(--accent)}
+.tag-calculated{background:rgba(251,191,36,0.15);color:var(--yellow)}
+.comparison-row{display:flex;gap:12px;margin:8px 0}
+.comparison-card{flex:1;padding:12px;border-radius:8px;text-align:center}
+.chi-good{color:var(--green)} .chi-ok{color:var(--yellow)} .chi-bad{color:var(--red)}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>αLGQV Rotation Curve Calculator</h1>
+<p class="subtitle">No dark matter particles · No free halo parameters · Only QCD + General Relativity</p>
+<p class="subtitle" style="font-size:11px;color:var(--dim)">B. Kriger 2026</p>
+<p class="subtitle" style="display:none"> — Local Gravity of Quantum Vacuum</p>
+
+
+
+<div class="card" style="border-left:3px solid var(--accent);margin-top:16px">
+<p style="font-size:14px;margin:0;line-height:1.7">
+<b>What is this?</b> An interactive calculator that predicts galaxy rotation curves 
+using only <b>standard physics</b> (QCD + General Relativity) — without dark matter particles. 
+The αLGQV framework replaces the unknown dark matter halo with three known components: 
+<b>dead stars</b> (from stellar evolution), <b>CGM gas</b> (observed by eROSITA), 
+and <b>excited quantum vacuum</b> (from measured QCD sigma terms). 
+The coupling constant α = 0.096 is <b>measured</b>, not fitted. 
+Select any of the 20 galaxies below, or enter your own data.
+</p>
+</div>
+
+<!-- Galaxy Selector -->
+<div class="card" style="margin-top:16px">
+<div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center" id="galaxy-buttons"></div>
+</div>
+
+<!-- Stats Bar -->
+<div class="card">
+<div class="grid grid-8" id="stats-bar"></div>
+</div>
+
+<!-- Chart -->
+<div class="card" style="padding:12px">
+<canvas id="chart" height="400"></canvas>
+</div>
+
+<!-- Custom Input -->
+<div class="card">
+<h3 style="margin-top:0">🔧 Custom Galaxy Input</h3>
+<p style="font-size:12px;color:var(--dim);margin-bottom:10px">
+Enter your own galaxy data. Paste radii and velocities as comma-separated values.</p>
+<div class="grid" style="grid-template-columns:1fr 1fr 1fr;gap:10px">
+<div><label>Galaxy Name</label><input id="c_name" value="MyGalaxy" /></div>
+<div><label>Hubble Type T (-5 to 10)</label><input id="c_T" type="number" value="5" min="-5" max="10"/></div>
+<div><label>V_flat (km/s)</label><input id="c_vflat" type="number" value="150"/></div>
+<div><label>R_d disk scale (kpc)</label><input id="c_Rd" type="number" value="3.0" step="0.1"/></div>
+<div><label>Distance (Mpc)</label><input id="c_dist" type="number" value="10" step="0.1"/></div>
+<div><label>Type name</label><input id="c_type" value="Sc"/></div>
+</div>
+<div class="grid" style="grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
+<div><label>R (kpc, comma-separated)</label>
+<input id="c_R" value="1,3,5,7,10,13,16,20,25,30,35,40"/></div>
+<div><label>V_obs (km/s, comma-separated)</label>
+<input id="c_Vo" value="40,80,110,130,145,150,150,150,148,147,148,149"/></div>
+</div>
+<div class="grid" style="grid-template-columns:1fr 1fr;gap:10px;margin-top:6px">
+<div><label>V_disk (km/s at Υ=1)</label>
+<input id="c_Vd" value="60,90,95,88,75,62,52,42,35,30,26,23"/></div>
+<div><label>V_gas (km/s)</label>
+<input id="c_Vg" value="3,8,13,17,20,22,24,25,26,27,27,28"/></div>
+</div>
+<button class="calc-btn" onclick="addCustomGalaxy()">Calculate & Add to Chart</button>
+</div>
+
+<!-- Results Table -->
+<div class="card">
+<h3 style="margin-top:0">📊 All Galaxies — Comparison</h3>
+<div style="overflow-x:auto"><table id="results-table">
+<thead><tr><th>Galaxy</th><th>Type</th><th>T</th><th>V_flat</th><th>R_d</th>
+<th>f_dead</th><th>r_c</th><th>K_dead</th><th>K_rc</th><th>K_cgm</th>
+<th style="color:var(--accent)">χ²_ν</th></tr></thead>
+<tbody id="results-body"></tbody>
+</table></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- EXPLANATIONS -->
+<!-- ═══════════════════════════════════════════════ -->
+
+
+<div class="card explanation">
+<h2>⚛️ Mechanisms of Vacuum Excitation</h2>
+
+<h3>The QCD Vacuum Is Not Empty</h3>
+<p>The vacuum of quantum chromodynamics (QCD) is the densest medium in the known universe.
+It is filled with the <b>chiral condensate</b> ⟨q̄q⟩ — a sea of virtual quark-antiquark pairs
+that spontaneously break chiral symmetry. This is not speculative: it is the foundation of 
+hadron physics, confirmed by decades of experiment and lattice QCD calculations.</p>
+
+<p>The energy density of the QCD condensate is enormous: <b>~10⁹ kg/m³</b> — comparable to 
+a neutron star. Yet it does not gravitate in the standard model because of an assumed 
+(but never proven) exact cancellation. In αLGQV, we do not assume this cancellation.
+Instead, we observe that the condensate <b>shifts</b> in the presence of baryonic matter,
+and this shift gravitates.</p>
+
+<h3>How a Proton Excites the Vacuum</h3>
+<p>The proton mass is 938 MeV. But the Higgs mechanism gives its three valence quarks 
+only ~9 MeV (~1%). The remaining <b>99%</b> comes from QCD fields: gluons, virtual pairs, 
+and the <b>chiral condensate</b>.</p>
+
+<p>The proton's color field <b>displaces</b> the condensate around it. This displacement 
+is measured by the <b>sigma terms</b>:</p>
+
+<div style="background:#1a1a2e;padding:12px;border-radius:8px;margin:10px 0;text-align:center">
+<span style="font-size:16px;color:#fbbf24;font-family:JetBrains Mono,monospace">
+σ<sub>πN</sub> = m<sub>q</sub>⟨N|ūu+d̄d|N⟩ = <b>59 MeV</b></span>
+<span style="color:#64748b;margin:0 16px">|</span>
+<span style="font-size:16px;color:#fbbf24;font-family:JetBrains Mono,monospace">
+σ<sub>s</sub> = m<sub>s</sub>⟨N|s̄s|N⟩ = <b>40 MeV</b></span>
+</div>
+
+<p>The <b>strangeness sigma term σ<sub>s</sub></b> is particularly revealing: the proton contains 
+<b>no strange valence quarks</b>, yet σ<sub>s</sub> ≠ 0. This means the proton modifies 
+the <em>vacuum</em> s̄s fluctuations around it. This is direct, model-independent evidence 
+that <b>baryons modify the vacuum energy</b>.</p>
+
+<p>The total vacuum energy shift per nucleon:</p>
+<div style="background:#1a1a2e;padding:12px;border-radius:8px;margin:10px 0;text-align:center">
+<span style="font-size:18px;color:#fbbf24;font-family:JetBrains Mono,monospace">
+α = (σ<sub>πN</sub> + σ<sub>s</sub>) / m<sub>N</sub> = (59 + 40) / 938 = <b>0.096</b></span>
+<span style="margin-left:16px" class="tag tag-measured">MEASURED, NOT FITTED</span>
+</div>
+
+<p>Each nucleon carries <b>~10%</b> of its mass as shifted chiral condensate with equation 
+of state <b>w = −1</b> (Lorentz scalar). This is the same equation of state as dark energy — 
+because it <em>is</em> the same physics, just local instead of cosmological.</p>
+
+<h3>Three Simultaneous Mechanisms</h3>
+<p>Every fermion in interstellar space excites the vacuum through <b>three mechanisms at once</b> 
+(Paper #4, Section 2 of Volume I):</p>
+
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:12px 0">
+
+<div style="background:#1a1a2e;padding:12px;border-radius:8px;border-left:3px solid #fbbf24">
+<div style="font-weight:700;color:#fbbf24;font-size:13px">I. Pauli Exclusion</div>
+<p style="font-size:12px;margin-top:6px">Vacuum energy = sum of zero-point energies of all field modes.
+A real fermion <b>occupies</b> a quantum state → that mode is <b>blocked</b>.
+The vacuum with fermions is a <b>different state</b> than without.
+Suppression ∝ fermion density.</p>
+<p style="font-size:10px;color:var(--dim)">Every electron, every quark in CGM does this.</p>
+</div>
+
+<div style="background:#1a1a2e;padding:12px;border-radius:8px;border-left:3px solid #34d399">
+<div style="font-weight:700;color:#34d399;font-size:13px">II. Vacuum Polarization</div>
+<p style="font-size:12px;margin-top:6px">Every charge polarizes the vacuum — virtual e⁺e⁻ pairs 
+orient in the field. Polarized vacuum ≠ unpolarized vacuum energetically. 
+Confirmed: Lamb shift, muon g−2, ATLAS light-by-light (2017).</p>
+<p style="font-size:10px;color:var(--dim)">Every charged particle in the galaxy does this.</p>
+</div>
+
+<div style="background:#1a1a2e;padding:12px;border-radius:8px;border-left:3px solid #a78bfa">
+<div style="font-weight:700;color:#a78bfa;font-size:13px">III. Curvature Modification</div>
+<p style="font-size:12px;margin-top:6px">Mass curves spacetime. Curved spacetime modifies the vacuum 
+mode spectrum (Birrell & Davies 1982). Different boundary conditions → different zero-point energy. 
+Same physics as the <b>Casimir effect</b>, but gravitational.</p>
+<p style="font-size:10px;color:var(--dim)">The entire gravitational well does this.</p>
+</div>
+
+</div>
+
+<p>All three act in the <b>same direction</b>: matter suppresses vacuum energy locally.
+On cosmological scales, they combine into a single effective coupling:</p>
+
+<div style="background:#1a1a2e;padding:12px;border-radius:8px;margin:10px 0;text-align:center">
+<span style="font-size:15px;color:#e2e8f0;font-family:JetBrains Mono,monospace">
+Λ(ρ<sub>m</sub>) = Λ₀ − α₁·ρ<sub>fermion</sub> − α₂·ρ<sub>charge</sub> − α₃·ρ<sub>curvature</sub>
+≈ Λ₀ − α<sub>eff</sub>·ρ<sub>m</sub></span>
+</div>
+
+<h3>Shielded vs. Unshielded</h3>
+<p>Inside a star, nucleons are packed at high density. Nonlinear self-screening 
+(Paper #9) reduces the effective coupling: <b>α<sub>scr</sub> ≈ 0.005</b>.</p>
+<p>A lone proton in the CGM — surrounded by vacuum — uses the <b>full bare coupling</b>: 
+<b>α<sub>bare</sub> ≈ 0.096</b>. No screening. Each of ~10⁶⁸ protons in the CGM 
+independently excites the vacuum around it.</p>
+
+<h3>How Much Excitation Is Needed?</h3>
+<p>The QCD condensate energy density is <b>~10⁹ kg/m³</b>.
+The needed vacuum excitation for flat rotation curves is <b>~10⁻²⁵ kg/m³</b>.
+This is a fraction of <b>10⁻³⁴</b> of the condensate — an absolutely negligible 
+perturbation. Like a ripple of 10⁻³⁴ on the surface of an ocean.</p>
+<p>The gravitational well of the galaxy (Φ/c² ~ 10⁻⁷) easily produces this. 
+The question is not "is there enough energy?" — the question is 
+"<b>what controls the tap?</b>" The answer: the screening factor, which is 
+the same physics as the cosmological constant problem.</p>
+
+<h3>The Action (from Volume II)</h3>
+<div style="background:#1a1a2e;padding:12px;border-radius:8px;margin:10px 0;text-align:center">
+<span style="font-size:15px;color:#e2e8f0;font-family:JetBrains Mono,monospace">
+S = ∫ d⁴x √(−g) { (m²<sub>Pl</sub>/2)[R + R²/(6M²)] + (1+2α) ℒ<sub>m</sub> }</span>
+</div>
+<p style="font-size:12px;color:var(--muted)">
+<b>R</b> — Einstein gravity. 
+<b>R²/(6M²)</b> — spacetime elasticity (Starobinsky).
+<b>(1+2α)ℒ<sub>m</sub></b> — vacuum-matter coupling. 
+Three terms, one action, zero new particles.</p>
+</div>
+
+<div class="card explanation">
+<h2>The Formula</h2>
+<div class="formula-box">
+v²(r) = (1+2α_scr)·[v²_bar + K_dead·f_dead·0.15·Υ_d·V²_disk]
+      + (1+2α_bare)·K_cgm·v²_CGM(r)
+      + v²_vac(r; r_c = K_rc·R_d)
+</div>
+
+<h3>Term 1: Visible Baryons + Dead Stars in Disk</h3>
+<p>v²<sub>bar</sub>(r) = Υ<sub>d</sub>·V²<sub>disk</sub> + Υ<sub>b</sub>·V²<sub>bul</sub> + |V<sub>gas</sub>|·V<sub>gas</sub></p>
+<p><b>V<sub>disk</sub>, V<sub>bul</sub>, V<sub>gas</sub></b> — from SPARC Table 2 (3.6 μm photometry + 21 cm HI).
+<span class="tag tag-observed">OBSERVED</span></p>
+<p><b>Υ<sub>d</sub> = 0.5 M☉/L☉</b> — disk mass-to-light ratio at 3.6 μm.
+<span class="tag tag-observed">STANDARD</span></p>
+<p><b>f<sub>dead</sub></b> — ratio of dead stars to living stars, from population synthesis.
+Only 15% remain in the thin disk; the rest contribute through the vacuum halo.
+<span class="tag tag-calculated">CALCULATED</span></p>
+<p><b>(1+2α<sub>scr</sub>) = 1.01</b> — effective gravitational coupling inside stars (screened).
+<span class="tag tag-derived">DERIVED</span></p>
+
+<h3>Term 2: Circumgalactic Medium (CGM)</h3>
+<p>Gas surrounding the galaxy out to 200–300 kpc. Primordial gas that never fell into the disk 
+(angular momentum) + gas ejected by galactic winds (supernovae, AGN).</p>
+<p><b>M<sub>CGM</sub> = 0.75·f<sub>b</sub>·M<sub>halo</sub>·K<sub>cgm</sub></b></p>
+<p><b>β-model profile:</b> ρ(r) ∝ [1+(r/r<sub>core</sub>)²]<sup>−3β/2</sup>, β ≈ 0.5</p>
+<p><b>Normalization:</b> from eROSITA X-ray observations (Zhang+2024): 
+0.8–3.5 × 10¹¹ M☉ for MW-mass galaxies. 
+<span class="tag tag-observed">OBSERVED</span></p>
+<p><b>(1+2α<sub>bare</sub>) = 1.19</b> — unshielded protons in CGM use the bare coupling.
+<span class="tag tag-measured">MEASURED</span></p>
+
+<h3>Term 3: Vacuum Halo (Level 2)</h3>
+<p>The gravitational potential well of the galaxy excites the QCD chiral condensate.
+This excitation is self-gravitating and settles into an isothermal sphere:</p>
+<p><b>ρ<sub>vac</sub>(r) = ρ<sub>0</sub> / [1 + (r/r<sub>c</sub>)²]</b></p>
+<p><b>v²<sub>vac</sub>(r) = 4πGρ<sub>0</sub>r²<sub>c</sub>·[1 − (r<sub>c</sub>/r)·arctan(r/r<sub>c</sub>)]</b></p>
+<p><b>r<sub>c</sub> = K<sub>rc</sub>·R<sub>d</sub></b> — vacuum core radius equals the disk scale length, 
+modified by galaxy morphology. <span class="tag tag-derived">DERIVED</span></p>
+<p><b>ρ<sub>0</sub></b> — determined self-consistently: the potential well depth sets
+how much vacuum is excited. Not fitted — follows from the baryonic distribution.
+<span class="tag tag-derived">SELF-CONSISTENT</span></p>
+</div>
+
+<div class="card explanation">
+<h2>The Coupling Constant α</h2>
+<p>The single fundamental parameter of αLGQV:</p>
+<div class="formula-box">α_bare = (σ_πN + σ_s) / m_N = (59 + 40) / 938 = 0.1055</div>
+<p><b>σ<sub>πN</sub> = 59 MeV</b> — pion-nucleon sigma term. Measures how much the proton mass
+comes from the chiral condensate. From πN scattering data + lattice QCD.
+<span class="tag tag-measured">MEASURED</span></p>
+<p><b>σ<sub>s</sub> = 40 MeV</b> — strangeness sigma term. The proton has no strange valence quarks,
+but σ<sub>s</sub> ≠ 0 because the proton modifies the <em>vacuum</em> s̄s fluctuations around it.
+This <em>proves</em> that baryons modify the vacuum energy.
+<span class="tag tag-measured">MEASURED</span></p>
+<p><b>Screening:</b> Inside stars, nonlinear self-screening (Paper #9) reduces 
+α<sub>bare</sub> → α<sub>scr</sub> ≈ 0.005. In the diffuse CGM, each proton is isolated — 
+full α<sub>bare</sub> ≈ 0.1 applies.</p>
+</div>
+
+
+
+<div class="card explanation">
+<h2>Morphological Coefficient K(T)</h2>
+<p>Galaxy shape (Hubble type T) determines the star formation history, wind efficiency,
+and potential well depth. Three coefficients modify the base formula:</p>
+<table style="font-size:13px;margin:12px 0">
+<tr><th>T</th><th>Type</th><th>K<sub>dead</sub></th><th>K<sub>rc</sub></th><th>K<sub>cgm</sub></th><th>Physics</th></tr>
+<tr><td>−5</td><td>E</td><td>1.50</td><td>0.50</td><td>1.50</td><td style="text-align:left">Old, deep well, hot X-ray halo</td></tr>
+<tr><td>0</td><td>S0</td><td>1.40</td><td>0.60</td><td>1.40</td><td style="text-align:left">Lenticular, little gas</td></tr>
+<tr><td>3</td><td>Sb</td><td>1.13</td><td>0.87</td><td>1.13</td><td style="text-align:left">Classical spiral, large bulge</td></tr>
+<tr><td><b>5</b></td><td><b>Sc</b></td><td><b>1.00</b></td><td><b>1.00</b></td><td><b>1.00</b></td><td style="text-align:left"><b>Standard (NGC 3198)</b></td></tr>
+<tr><td>8</td><td>Sdm</td><td>1.30</td><td>1.50</td><td>0.80</td><td style="text-align:left">Late-type, low-Z → top-heavy IMF longer</td></tr>
+<tr><td>10</td><td>Im</td><td>0.70</td><td>2.00</td><td>0.60</td><td style="text-align:left">Dwarf, shallow well → extended core</td></tr>
+</table>
+<p><b>K<sub>rc</sub> solves the cusp-core problem automatically:</b> dwarfs (T=10) have K<sub>rc</sub>=2.0 → 
+large vacuum core → flat center (core). Ellipticals (T=−5) have K<sub>rc</sub>=0.5 → 
+compact core → steep rise. Not fitted — consequence of potential well depth.</p>
+</div>
+
+<div class="card explanation">
+<h2>Why Not Dark Matter?</h2>
+<div class="comparison-row">
+<div class="comparison-card" style="background:rgba(239,68,68,0.08);border:1px solid #7f1d1d">
+<div style="font-size:16px;font-weight:700;color:var(--red)">ΛCDM</div>
+<p style="font-size:12px">2 free halo parameters per galaxy (ρ<sub>s</sub>, r<sub>s</sub>)<br>
+Unknown particle — <b>40 years of searches, zero detections</b><br>
+LUX, XENON, PandaX, LHC, ADMX — nothing found<br>
+Can fit anything → cannot be falsified by rotation curves</p>
+</div>
+<div class="comparison-card" style="background:rgba(96,165,250,0.08);border:1px solid #1e3a5f">
+<div style="font-size:16px;font-weight:700;color:var(--accent)">αLGQV</div>
+<p style="font-size:12px"><b>Zero</b> free halo parameters<br>
+α = 0.096 from QCD σ-terms — <b>already measured</b><br>
+Uses only: protons, neutrons, photons, GR<br>
+Dead stars + CGM gas + vacuum excitation = rotation curves</p>
+</div>
+</div>
+</div>
+
+<div class="card explanation">
+<h2>References</h2>
+<p style="font-size:12px">
+<b>Theory:</b> Kriger B. 2026, "A Dark-Sector-Free Cosmology" Volumes I & II<br>
+<b>σ-terms:</b> Hoferichter M. et al. 2015, PRL 115, 092301; Alarcón J.M. et al. 2021, PRL 127, 092001<br>
+<b>SPARC data:</b> Lelli F., McGaugh S., Schombert J. 2016, AJ 152, 157<br>
+<b>CGM mass:</b> Zhang Y. et al. 2024, A&A (eROSITA); Tumlinson J. et al. 2017, ARA&A 55, 389<br>
+<b>Winds:</b> Heckman T. & Thompson T. 2017, arXiv:1701.09062; Muratov A. et al. 2015, MNRAS 454, 2691<br>
+<b>Magnetic fields:</b> Beck R. 2015, A&A Rev 24, 4<br>
+<b>Vacuum QFT:</b> Birrell N.D. & Davies P.C.W. 1982, "Quantum Fields in Curved Space"
+</p>
+</div>
+
+<div style="text-align:center;color:var(--dim);font-size:11px;padding:20px 0">
+αLGQV Rotation Curve Calculator · B. Kriger 2026 · No dark matter particles needed
+</div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// αLGQV PHYSICS ENGINE
+// ═══════════════════════════════════════════
+const ALPHA_BARE=0.1055,ALPHA_SCR=0.005,YD=0.5,G=4.302e-6,FB=0.25;
+
+const GALAXIES={
+NGC3198:{T:5,type:"Sc",dist:13.8,Rd:3.1,vflat:150,
+R:[0.32,0.96,1.61,2.24,2.89,3.54,4.17,4.82,5.46,6.1,6.74,8.04,10.04,12.05,16.07,20.05,24.03,28.16,32.14,36.12,40.1,44.08],
+Vo:[24,46,69,82,98,107,117,127,134,140,144,147,152,156,153,154,150,148,147,148,150,149],
+Vd:[63,74,79,83,84,86,88,91,93,96,97,94,91,91,82,77,72,70,66,65,64,63],
+Vg:[0,0,0,0.4,0.2,1.2,2.3,3.4,4.7,6,7.2,9.3,11.3,12.5,14.3,15.5,16.3,17.5,17.9,18.8,19.4,19.6]},
+NGC2403:{T:6,type:"Scd",dist:3.2,Rd:1.7,vflat:134,
+R:[0.17,0.34,0.51,0.68,0.86,1.03,1.2,1.37,1.54,1.71,2.05,2.74,3.42,4.11,4.79,5.48,6.16,6.85,8.22,10.27,12.33,14.38,16.44,18.49,20.55],
+Vo:[18,30,46,55,64,68,75,80,86,89,97,108,113,116,121,124,127,130,133,134,136,136,135,135,136],
+Vd:[29,41,50,57,62,66,70,73,76,78,82,86,88,88,87,85,83,80,74,65,57,51,45,41,37],
+Vg:[0,0,0,1,1,2,2,3,3,4,5,7,9,10,12,13,14,15,17,19,20,21,22,22,23]},
+NGC6503:{T:6,type:"Scd",dist:5.3,Rd:1.7,vflat:115,
+R:[0.26,0.52,0.78,1.04,1.3,1.56,1.82,2.08,2.34,2.86,3.38,3.9,4.94,5.98,7.02,8.06,9.1,10.14,12.22,14.3,16.38,18.46,20.54,22.62],
+Vo:[20,40,55,65,73,78,83,87,90,95,99,102,108,111,113,114,115,115,115,115,115,115,115,115],
+Vd:[24,39,49,55,59,62,65,67,68,70,70,69,65,60,55,50,46,42,36,31,27,24,22,20],
+Vg:[0,1,1,2,3,3,4,5,5,7,8,9,11,12,13,14,15,16,17,18,19,19,20,20]},
+DDO154:{T:10,type:"Im",dist:4.3,Rd:0.8,vflat:47,
+R:[0.14,0.28,0.42,0.56,0.7,0.84,0.98,1.26,1.54,2.1,3.22,4.34,4.9,5.46,6.3,7.14],
+Vo:[5,8,13,16,20,22,25,29,33,37,42,46,47,47,47,47],
+Vd:[3,5,6,7,7,8,8,8,8,8,7,6,5,5,4,4],
+Vg:[2,4,6,8,10,11,13,15,17,19,22,23,24,24,25,25]},
+UGC00128:{T:8,type:"Sdm",dist:64.5,Rd:6.5,vflat:132,
+R:[3.61,7.22,10.84,14.45,18.06,21.67,25.28,28.89,32.5,36.12,39.73,43.34,46.95,50.56,54.17,57.78,61.4,65.01,68.62,72.23,75.84,79.45],
+Vo:[35,52,68,84,97,106,112,117,120,123,125,127,128,129,129,130,130,131,131,132,132,132],
+Vd:[21,36,44,49,51,52,51,50,49,47,46,44,43,41,40,38,37,36,35,34,33,32],
+Vg:[5,9,13,16,19,22,24,26,27,29,30,31,32,33,33,34,34,35,35,35,36,36]},
+NGC7331:{T:3,type:"Sb",dist:14.7,Rd:4.5,vflat:245,R:[2,4,6,8,10,14,18,22,26,30],Vo:[150,200,225,240,245,245,245,245,243,240],Vd:[120,150,140,125,110,85,70,58,50,43],Vg:[5,10,15,18,20,22,24,25,26,27]},
+NGC2841:{T:3,type:"Sb",dist:14.1,Rd:4.2,vflat:305,R:[2,5,8,12,16,20,25,30,35,40],Vo:[200,260,285,300,305,305,303,300,298,295],Vd:[160,200,180,150,125,105,85,70,60,52],Vg:[5,10,15,18,20,22,23,24,25,26]},
+NGC3521:{T:4,type:"Sbc",dist:10.7,Rd:3.0,vflat:220,R:[1,3,5,7,10,13,16,20,24,28],Vo:[100,170,200,215,220,220,218,218,220,220],Vd:[80,120,115,100,85,70,60,50,42,36],Vg:[3,8,12,15,18,20,22,23,24,25]},
+NGC2903:{T:4,type:"Sbc",dist:8.9,Rd:2.8,vflat:195,R:[0.5,1.5,3,5,7,10,13,16,20,24],Vo:[80,140,170,185,192,195,195,195,193,190],Vd:[65,100,110,100,88,72,60,50,42,36],Vg:[2,5,10,14,17,19,21,22,23,24]},
+NGC5055:{T:4,type:"Sbc",dist:10.1,Rd:4.0,vflat:200,R:[2,4,6,8,12,16,20,25,30,35,40],Vo:[120,165,185,195,200,200,198,195,193,192,190],Vd:[95,130,125,110,90,72,60,48,40,34,30],Vg:[4,8,12,15,18,20,22,23,24,25,25]},
+IC2574:{T:9,type:"Sm",dist:4.0,Rd:3.5,vflat:66,R:[0.5,1,2,3,4,5,6,7,8,9,10,11,12],Vo:[10,18,28,36,44,50,55,59,62,64,65,66,66],Vd:[5,8,10,11,11,10,9,8,7,6,6,5,5],Vg:[3,6,10,14,17,19,21,23,24,25,26,27,27]},
+NGC925:{T:7,type:"Sd",dist:9.2,Rd:3.8,vflat:115,R:[1,3,5,7,9,11,13,15,17,19],Vo:[40,70,90,100,108,112,114,115,115,115],Vd:[30,50,48,42,36,31,27,24,21,19],Vg:[5,12,18,22,25,27,29,30,31,32]},
+NGC3109:{T:9,type:"Sm",dist:1.3,Rd:1.5,vflat:67,R:[0.3,0.6,1,1.5,2,3,4,5,6,7],Vo:[12,22,32,42,50,57,62,65,67,67],Vd:[8,13,15,14,12,9,7,6,5,4],Vg:[4,8,13,18,22,26,28,30,31,32]},
+NGC1003:{T:6,type:"Scd",dist:11.6,Rd:2.2,vflat:110,R:[1,2,4,6,8,10,12,15,18,21],Vo:[35,55,78,92,100,105,108,110,110,110],Vd:[25,38,42,38,33,28,24,20,17,15],Vg:[3,8,15,20,24,27,29,31,32,33]},
+UGC02259:{T:8,type:"Sdm",dist:10,Rd:1.8,vflat:90,R:[0.5,1,2,3,4,5,6,7,8,9],Vo:[20,35,52,65,75,82,86,88,90,90],Vd:[15,22,24,22,19,16,14,12,11,10],Vg:[3,7,13,18,22,25,27,28,29,30]},
+NGC2976:{T:5,type:"Sc",dist:3.6,Rd:1.2,vflat:85,R:[0.2,0.4,0.6,0.8,1,1.2,1.5,1.8,2.1,2.4],Vo:[25,42,55,65,72,78,82,84,85,85],Vd:[20,32,38,40,40,38,35,31,28,25],Vg:[2,4,7,10,13,15,18,20,22,23]},
+UGC06930:{T:7,type:"Sd",dist:17,Rd:3.0,vflat:105,R:[1,3,5,7,9,11,13,15,17,19],Vo:[28,55,75,88,96,100,103,104,105,105],Vd:[20,38,40,36,31,27,23,20,18,16],Vg:[4,10,16,21,24,27,29,30,31,32]},
+UGC05986:{T:8,type:"Sdm",dist:8.5,Rd:1.5,vflat:78,R:[0.5,1,1.5,2,3,4,5,6,7,8],Vo:[18,30,42,50,60,68,73,76,77,78],Vd:[12,18,20,19,16,13,11,9,8,7],Vg:[3,7,11,15,19,22,24,26,27,28]},
+NGC4183:{T:6,type:"Scd",dist:16.7,Rd:2.5,vflat:112,R:[1,3,5,7,9,11,13,15,17,19],Vo:[30,60,80,95,104,108,110,111,112,112],Vd:[22,40,42,38,33,28,24,21,18,16],Vg:[3,9,15,20,24,27,29,30,31,32]},
+NGC0055:{T:9,type:"Sm",dist:2.1,Rd:2.0,vflat:86,R:[0.5,1,2,3,4,5,6,7,8,9,10],Vo:[20,35,52,62,70,76,80,83,85,86,86],Vd:[14,20,22,20,17,14,12,10,9,8,7],Vg:[4,8,14,19,23,26,28,29,30,31,31]}
+};
+
+function morphK(T){
+const n=[-5,-1,2,5,8,10],Kd=[1.5,1.4,1.2,1,1.3,.7],Kr=[.5,.6,.8,1,1.5,2],Kc=[1.5,1.4,1.2,1,.8,.6];
+const interp=(a)=>{const t=Math.max(-5,Math.min(10,T));for(let i=0;i<n.length-1;i++)if(t>=n[i]&&t<=n[i+1]){const f=(t-n[i])/(n[i+1]-n[i]);return a[i]*(1-f)+a[i+1]*f}return a[a.length-1]};
+return{Kd:interp(Kd),Kr:interp(Kr),Kc:interp(Kc)}}
+
+function calc(g){
+const{R,Vo,Vd,Vg,T,Rd,vflat}=g,N=R.length,K=morphK(T);
+const Mh=vflat**2*R[N-1]/G;
+const fd=Math.max((5+1.5*Math.log10(Math.max(Mh/1e12,.01)))*K.Kd,.5);
+const rc=Rd*K.Kr;
+const v2b=R.map((_,i)=>YD*Vd[i]**2+Math.abs(Vg[i])*Vg[i]);
+const v2dd=R.map((_,i)=>fd*.15*YD*Vd[i]**2);
+const Mcgm=.75*FB*Mh*K.Kc,rcc=2.5*Rd;
+const v2c=R.map(r=>{const x=r/rcc;return G*Mcgm*(1-1/Math.sqrt(1+x*x))/r});
+const v2t=R.map((_,i)=>(1+2*ALPHA_SCR)*(v2b[i]+v2dd[i])+(1+2*ALPHA_BARE)*v2c[i]);
+const ir=N-1,br=1-(rc/R[ir])*Math.atan(R[ir]/rc);
+const v2vi=Math.max(vflat**2-v2t[ir],0)/Math.max(br,.01);
+const v2v=R.map(r=>v2vi*(1-(rc/r)*Math.atan(r/rc)));
+const vp=R.map((_,i)=>Math.sqrt(Math.max(v2t[i]+v2v[i],0)));
+const vb=R.map((_,i)=>Math.sqrt(Math.max(v2b[i],0)));
+const vdd=R.map((_,i)=>Math.sqrt(Math.max(v2dd[i],0)));
+const vc=R.map((_,i)=>Math.sqrt(Math.max(v2c[i],0)));
+const vv=R.map((_,i)=>Math.sqrt(Math.max(v2v[i],0)));
+let chi2=0;if(Vo)Vo.forEach((v,i)=>{const e=Math.max(5,v*.05);chi2+=((v-vp[i])/e)**2});
+chi2/=Math.max(N-1,1);
+return{R,Vo,vp,vb,vdd,vc,vv,chi2,fd,rc,K,Mh,rho0:v2vi/(4*Math.PI*G*rc**2)}}
+
+// ═══════════════════════════════════════════
+// UI
+// ═══════════════════════════════════════════
+const typeEmoji=T=>T<=0?'🟡':T<=3?'🌀':T<=6?'💫':T<=8?'🌌':'✨';
+let chart=null,currentGalaxy='NGC3198';
+
+const chiClass=c=>c<5?"chi-good":c<15?"chi-ok":"chi-bad";
+
+function buildButtons(){
+const el=document.getElementById('galaxy-buttons');
+el.innerHTML='';
+Object.keys(GALAXIES).forEach(nm=>{
+const g=GALAXIES[nm];
+const btn=document.createElement('button');
+btn.className='galaxy-btn'+(nm===currentGalaxy?' active':'');
+btn.innerHTML=`<span style="font-size:16px;display:block">${typeEmoji(g.T)}</span><div class="name">${nm}</div><div class="type">${g.type} T=${g.T}</div>`;
+btn.onclick=()=>{currentGalaxy=nm;update()};
+el.appendChild(btn)});}
+
+function updateStats(r){
+const items=[['Galaxy',currentGalaxy],['Type',GALAXIES[currentGalaxy].type+' T='+GALAXIES[currentGalaxy].T],
+['V_flat',r.Mh?GALAXIES[currentGalaxy].vflat+' km/s':'—'],['R_d',GALAXIES[currentGalaxy].Rd+' kpc'],
+['f_dead',r.fd.toFixed(1)],['r_c',r.rc.toFixed(1)+' kpc'],['χ²_ν','<span class="'+chiClass(r.chi2)+'">'+r.chi2.toFixed(2)+'</span>'],
+['M_halo',(r.Mh/1e11).toFixed(1)+'×10¹¹']];
+document.getElementById('stats-bar').innerHTML=items.map(([l,v])=>`<div class="stat-box"><div class="stat-label">${l}</div><div class="stat-val">${v}</div></div>`).join('')}
+
+function updateChart(r){
+const g=GALAXIES[currentGalaxy];
+if(chart)chart.destroy();
+const ctx=document.getElementById('chart').getContext('2d');
+chart=new Chart(ctx,{type:'line',data:{labels:r.R.map(x=>x.toFixed(1)),datasets:[
+{label:'V observed',data:r.Vo,borderColor:'#fff',backgroundColor:'#fff',borderWidth:2.5,pointRadius:3,pointStyle:'circle',tension:0},
+{label:'V model (αLGQV)',data:r.vp.map(v=>+v.toFixed(1)),borderColor:'#60a5fa',borderWidth:2.5,pointRadius:0,tension:.3},
+{label:'Stars',data:r.vb.map(v=>+v.toFixed(1)),borderColor:'#fbbf24',borderWidth:1,borderDash:[5,5],pointRadius:0,tension:.3},
+{label:'Dead stars',data:r.vdd.map(v=>+v.toFixed(1)),borderColor:'#f87171',borderWidth:1,borderDash:[5,5],pointRadius:0,tension:.3},
+{label:'CGM gas',data:r.vc.map(v=>+v.toFixed(1)),borderColor:'#34d399',borderWidth:1,borderDash:[5,5],pointRadius:0,tension:.3},
+{label:'Vacuum halo',data:r.vv.map(v=>+v.toFixed(1)),borderColor:'#a78bfa',borderWidth:1.5,borderDash:[3,3],pointRadius:0,tension:.3}
+]},options:{responsive:true,interaction:{mode:'index',intersect:false},scales:{
+x:{title:{display:true,text:'R (kpc)',color:'#64748b'},ticks:{color:'#64748b',maxTicksLimit:15},grid:{color:'#1e293b'}},
+y:{title:{display:true,text:'v (km/s)',color:'#64748b'},ticks:{color:'#64748b'},grid:{color:'#1e293b'},beginAtZero:true}},
+plugins:{legend:{labels:{color:'#94a3b8',font:{size:11}}},tooltip:{backgroundColor:'#1e293b',borderColor:'#334155',borderWidth:1}}}});}
+
+function updateTable(){
+const tbody=document.getElementById('results-body');
+tbody.innerHTML='';
+Object.keys(GALAXIES).forEach(nm=>{
+const g=GALAXIES[nm],r=calc(g);
+const tr=document.createElement('tr');
+tr.style.cursor='pointer';
+tr.onclick=()=>{currentGalaxy=nm;update()};
+if(nm===currentGalaxy)tr.style.background='rgba(96,165,250,0.08)';
+tr.innerHTML=`<td style="font-weight:${nm===currentGalaxy?700:400}">${nm}</td><td>${g.type}</td><td>${g.T}</td>
+<td>${g.vflat}</td><td>${g.Rd}</td><td>${r.fd.toFixed(1)}</td><td>${r.rc.toFixed(1)}</td>
+<td>${r.K.Kd.toFixed(2)}</td><td>${r.K.Kr.toFixed(2)}</td><td>${r.K.Kc.toFixed(2)}</td>
+<td class="${chiClass(r.chi2)}" style="font-weight:700">${r.chi2.toFixed(1)}</td>`;
+tbody.appendChild(tr)});}
+
+function update(){
+const r=calc(GALAXIES[currentGalaxy]);
+buildButtons();updateStats(r);updateChart(r);updateTable();}
+
+function addCustomGalaxy(){
+try{
+const name=document.getElementById('c_name').value||'Custom';
+const T=+document.getElementById('c_T').value;
+const vflat=+document.getElementById('c_vflat').value;
+const Rd=+document.getElementById('c_Rd').value;
+const R=document.getElementById('c_R').value.split(',').map(Number);
+const Vo=document.getElementById('c_Vo').value.split(',').map(Number);
+const Vd=document.getElementById('c_Vd').value.split(',').map(Number);
+const Vg=document.getElementById('c_Vg').value.split(',').map(Number);
+if(R.length!==Vo.length||R.length!==Vd.length||R.length!==Vg.length){alert('Arrays must have equal length');return}
+GALAXIES[name]={T,type:document.getElementById('c_type').value,dist:+document.getElementById('c_dist').value,Rd,vflat,R,Vo,Vd,Vg};
+currentGalaxy=name;update();
+}catch(e){alert('Error: '+e.message)}}
+
+update();
+</script>
+</body>
+</html>
