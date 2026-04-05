@@ -1,0 +1,1376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>αLGQV Theory — A Dark-Sector-Free Cosmology</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<style>
+:root {
+  --bg: #0a0e1a;
+  --bg2: #0f1528;
+  --bg3: #141c33;
+  --gold: #c9a84c;
+  --gold-dim: #8a7234;
+  --gold-bright: #f0d878;
+  --blue: #4a7ec7;
+  --blue-dim: #2a4a7a;
+  --cyan: #5ab8c7;
+  --white: #e8e4dc;
+  --white-dim: #9a978f;
+  --red: #c75a5a;
+  --green: #5ac77a;
+  --purple: #8a6ec7;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--white);
+  font-family: 'Source Sans 3', sans-serif;
+  font-weight: 300;
+  line-height: 1.55;
+  min-height: 100vh;
+}
+
+.poster {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 40px 30px 60px;
+}
+
+/* ── HEADER ── */
+.header {
+  text-align: center;
+  padding: 60px 40px 50px;
+  position: relative;
+  border-bottom: 1px solid var(--gold-dim);
+  margin-bottom: 50px;
+}
+
+.header::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 120px; height: 3px;
+  background: var(--gold);
+}
+
+.greek-alpha {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 5.5rem;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 0.02em;
+  line-height: 1;
+  margin-bottom: 2px;
+  text-shadow: 0 0 60px rgba(201,168,76,0.25);
+}
+
+.greek-alpha sub {
+  font-size: 0.35em;
+  color: var(--gold);
+  vertical-align: baseline;
+  position: relative;
+  top: -0.1em;
+  letter-spacing: 0.15em;
+  font-weight: 400;
+  opacity: 0.7;
+}
+
+.header h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem;
+  font-weight: 400;
+  color: var(--white);
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+}
+
+.header .subtitle {
+  font-size: 1.05rem;
+  color: var(--white-dim);
+  letter-spacing: 0.04em;
+  max-width: 800px;
+  margin: 0 auto 20px;
+}
+
+.author-line {
+  font-size: 0.9rem;
+  color: var(--gold-dim);
+  letter-spacing: 0.06em;
+  margin-top: 16px;
+}
+
+.author-line a {
+  color: var(--gold);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.3s;
+}
+.author-line a:hover { border-bottom-color: var(--gold); }
+
+/* ── GRID ── */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 28px;
+  margin-bottom: 36px;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+  margin-bottom: 36px;
+}
+
+.span-2 { grid-column: span 2; }
+.span-3 { grid-column: span 3; }
+
+/* ── CARDS ── */
+.card {
+  background: var(--bg2);
+  border: 1px solid rgba(201,168,76,0.12);
+  border-radius: 6px;
+  padding: 28px 26px;
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+  opacity: 0.6;
+}
+
+.card.accent-blue::before { background: linear-gradient(90deg, transparent, var(--blue), transparent); }
+.card.accent-cyan::before { background: linear-gradient(90deg, transparent, var(--cyan), transparent); }
+.card.accent-green::before { background: linear-gradient(90deg, transparent, var(--green), transparent); }
+.card.accent-red::before { background: linear-gradient(90deg, transparent, var(--red), transparent); }
+.card.accent-purple::before { background: linear-gradient(90deg, transparent, var(--purple), transparent); }
+
+.card-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.card.accent-blue .card-label { color: var(--blue); }
+.card.accent-cyan .card-label { color: var(--cyan); }
+.card.accent-green .card-label { color: var(--green); }
+.card.accent-red .card-label { color: var(--red); }
+.card.accent-purple .card-label { color: var(--purple); }
+
+.card h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--white);
+  margin-bottom: 14px;
+  line-height: 1.3;
+}
+
+.card p {
+  font-size: 0.88rem;
+  color: var(--white-dim);
+  margin-bottom: 10px;
+}
+
+.card p:last-child { margin-bottom: 0; }
+
+/* ── EQUATION BOX ── */
+.eq-box {
+  background: var(--bg);
+  border: 1px solid rgba(201,168,76,0.15);
+  border-radius: 4px;
+  padding: 20px 24px;
+  margin: 14px 0;
+  text-align: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem;
+  color: var(--gold-bright);
+  letter-spacing: 0.02em;
+  line-height: 1.6;
+}
+
+.eq-box .katex { font-size: 1.35rem; color: var(--white); }
+.eq-box.small .katex { font-size: 1.1rem; }
+
+.eq-box.small { font-size: 0.95rem; }
+
+.eq-box .eq-label {
+  display: block;
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.65rem;
+  color: var(--white-dim);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-top: 8px;
+}
+
+/* ── CHAIN ── */
+.chain {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.chain-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 12px 0;
+  position: relative;
+}
+
+.chain-step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: 15px;
+  top: 38px;
+  bottom: -2px;
+  width: 1px;
+  background: var(--gold-dim);
+  opacity: 0.4;
+}
+
+.chain-num {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid var(--gold-dim);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--gold);
+  font-weight: 500;
+}
+
+.chain-text {
+  flex: 1;
+}
+
+.chain-text strong {
+  color: var(--white);
+  font-weight: 600;
+  display: block;
+  font-size: 0.88rem;
+  margin-bottom: 2px;
+}
+
+.chain-text span {
+  font-size: 0.8rem;
+  color: var(--white-dim);
+}
+
+/* ── RESULT ROWS ── */
+.result-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  font-size: 0.84rem;
+}
+
+.result-row:last-child { border-bottom: none; }
+
+.result-label { color: var(--white-dim); flex: 1; }
+
+.result-pred {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  color: var(--gold-bright);
+  text-align: right;
+  min-width: 100px;
+}
+
+.result-obs {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  color: var(--cyan);
+  text-align: right;
+  min-width: 100px;
+}
+
+.result-ratio {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  font-weight: 500;
+  text-align: right;
+  min-width: 60px;
+}
+
+.ratio-good { color: var(--green); }
+.ratio-ok { color: var(--gold); }
+
+.result-header {
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--white-dim);
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  margin-bottom: 4px;
+}
+
+/* ── TAGS ── */
+.tag {
+  display: inline-block;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  padding: 3px 10px;
+  border-radius: 3px;
+  margin: 2px 3px 2px 0;
+  font-weight: 400;
+}
+
+.tag-vol1 { background: rgba(74,126,199,0.15); color: var(--blue); border: 1px solid rgba(74,126,199,0.25); }
+.tag-vol2 { background: rgba(201,168,76,0.12); color: var(--gold); border: 1px solid rgba(201,168,76,0.2); }
+.tag-test { background: rgba(90,199,122,0.12); color: var(--green); border: 1px solid rgba(90,199,122,0.2); }
+
+/* ── SECTION DIVIDERS ── */
+.section-title {
+  text-align: center;
+  margin: 10px 0 28px;
+  position: relative;
+}
+
+.section-title::before,
+.section-title::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: calc(50% - 160px);
+  height: 1px;
+  background: rgba(201,168,76,0.2);
+}
+.section-title::before { left: 0; }
+.section-title::after { right: 0; }
+
+.section-title span {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+  padding: 0 20px;
+  background: var(--bg);
+}
+
+/* ── SCALE LADDER ── */
+.scale-ladder {
+  display: flex;
+  gap: 0;
+  margin: 10px 0;
+}
+
+.scale-item {
+  flex: 1;
+  text-align: center;
+  padding: 12px 8px;
+  position: relative;
+}
+
+.scale-item:not(:last-child)::after {
+  content: '→';
+  position: absolute;
+  right: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--gold-dim);
+  font-size: 0.9rem;
+  z-index: 1;
+}
+
+.scale-name {
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--white-dim);
+  margin-bottom: 4px;
+}
+
+.scale-size {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--gold);
+}
+
+.scale-effect {
+  font-size: 0.75rem;
+  color: var(--cyan);
+  margin-top: 3px;
+}
+
+/* ── FALSIFICATION ── */
+.false-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 7px 0;
+  font-size: 0.84rem;
+  color: var(--white-dim);
+}
+
+.false-icon {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--red);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  color: var(--red);
+  margin-top: 1px;
+}
+
+/* ── FOOTER ── */
+.footer {
+  text-align: center;
+  margin-top: 50px;
+  padding-top: 30px;
+  border-top: 1px solid var(--gold-dim);
+}
+
+.footer .vol-links {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.vol-link {
+  display: block;
+  padding: 16px 28px;
+  border: 1px solid var(--gold-dim);
+  border-radius: 4px;
+  text-decoration: none;
+  color: var(--white);
+  transition: all 0.3s;
+  max-width: 420px;
+}
+
+.vol-link:hover {
+  border-color: var(--gold);
+  background: rgba(201,168,76,0.05);
+}
+
+.vol-link .vol-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--gold);
+  margin-bottom: 4px;
+}
+
+.vol-link .vol-title {
+  font-size: 0.8rem;
+  color: var(--white-dim);
+  line-height: 1.4;
+}
+
+.vol-link .vol-doi {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  color: var(--gold-dim);
+  margin-top: 6px;
+}
+
+.footer-meta {
+  font-size: 0.75rem;
+  color: var(--white-dim);
+  opacity: 0.5;
+}
+
+/* ── HIGHLIGHT TEXT ── */
+.hl { color: var(--gold-bright); }
+.hl-blue { color: var(--blue); }
+.hl-cyan { color: var(--cyan); }
+.hl-green { color: var(--green); }
+
+.mono {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85em;
+}
+
+.interactive-links {
+  display: flex;
+  gap: 16px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+
+.interactive-link {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 20px;
+  background: rgba(90,184,199,0.06);
+  border: 1px solid rgba(90,184,199,0.2);
+  border-radius: 5px;
+  text-decoration: none;
+  flex: 1;
+  min-width: 280px;
+  transition: all 0.3s;
+}
+
+.interactive-link:hover {
+  border-color: var(--cyan);
+  background: rgba(90,184,199,0.1);
+}
+
+.interactive-link .ilink-icon {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 5px;
+  background: rgba(90,184,199,0.1);
+  border: 1px solid rgba(90,184,199,0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  color: var(--cyan);
+}
+
+.interactive-link .ilink-text {
+  flex: 1;
+}
+
+.interactive-link .ilink-label {
+  font-size: 0.6rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  margin-bottom: 2px;
+  font-weight: 600;
+}
+
+.interactive-link .ilink-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--white);
+  line-height: 1.3;
+}
+
+.interactive-link .ilink-desc {
+  font-size: 0.74rem;
+  color: var(--white-dim);
+  margin-top: 2px;
+  line-height: 1.4;
+}
+
+.intro-volumes {
+  display: flex;
+  gap: 20px;
+  margin-top: 28px;
+  flex-wrap: wrap;
+}
+
+.intro-vol {
+  flex: 1;
+  min-width: 300px;
+  padding: 24px 28px;
+  border: 1px solid rgba(201,168,76,0.25);
+  border-radius: 5px;
+  text-align: center;
+  text-decoration: none;
+  display: block;
+  transition: all 0.3s;
+}
+
+.intro-vol:hover {
+  border-color: var(--gold);
+  background: rgba(201,168,76,0.04);
+}
+
+.intro-vol .iv-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  font-style: italic;
+  color: var(--gold);
+  margin-bottom: 8px;
+}
+
+.intro-vol .iv-title {
+  font-size: 0.9rem;
+  color: var(--white);
+  line-height: 1.45;
+  margin-bottom: 6px;
+}
+
+.intro-vol .iv-meta {
+  font-size: 0.82rem;
+  color: var(--white-dim);
+  margin-bottom: 10px;
+}
+
+.intro-vol .iv-doi {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--gold);
+}
+
+.cite-block {
+  margin-top: 24px;
+  padding: 18px 22px;
+  background: rgba(10,14,26,0.5);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 4px;
+}
+
+.cite-block .cite-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--white-dim);
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.cite-block .cite-text {
+  font-size: 0.78rem;
+  color: var(--white-dim);
+  line-height: 1.6;
+  margin-bottom: 8px;
+  text-indent: -2em;
+  padding-left: 2em;
+}
+
+.cite-block .cite-text:last-child { margin-bottom: 0; }
+
+.cite-block .cite-text a {
+  color: var(--gold-dim);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.3s;
+}
+
+.cite-block .cite-text a:hover { border-bottom-color: var(--gold-dim); }
+
+/* ── PUBLIC INTRO ── */
+.public-intro {
+  background: linear-gradient(135deg, rgba(201,168,76,0.06) 0%, rgba(90,184,199,0.04) 100%);
+  border: 1px solid rgba(201,168,76,0.18);
+  border-radius: 8px;
+  padding: 44px 48px 40px;
+  margin-bottom: 50px;
+  position: relative;
+  overflow: hidden;
+}
+
+.public-intro::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--gold), var(--cyan), var(--gold));
+  opacity: 0.7;
+}
+
+.public-intro .intro-eyebrow {
+  font-size: 0.68rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+
+.public-intro h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--white);
+  margin-bottom: 18px;
+  line-height: 1.3;
+}
+
+.public-intro .intro-body {
+  font-size: 1.02rem;
+  color: var(--white-dim);
+  line-height: 1.7;
+  max-width: 1000px;
+}
+
+.public-intro .intro-body p {
+  margin-bottom: 14px;
+}
+
+.public-intro .intro-body .hl {
+  color: var(--gold-bright);
+  font-weight: 400;
+}
+
+.read-more-links {
+  display: flex;
+  gap: 16px;
+  margin-top: 26px;
+  flex-wrap: wrap;
+}
+
+.read-more-link {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 18px;
+  background: rgba(10,14,26,0.6);
+  border: 1px solid rgba(201,168,76,0.14);
+  border-radius: 5px;
+  text-decoration: none;
+  flex: 1;
+  min-width: 260px;
+  transition: all 0.3s;
+}
+
+.read-more-link:hover {
+  border-color: var(--gold);
+  background: rgba(201,168,76,0.06);
+}
+
+.read-more-link .link-icon {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  background: rgba(201,168,76,0.1);
+  border: 1px solid rgba(201,168,76,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  color: var(--gold);
+  margin-top: 2px;
+}
+
+.read-more-link .link-text {
+  flex: 1;
+}
+
+.read-more-link .link-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+  margin-bottom: 3px;
+}
+
+.read-more-link .link-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--white);
+  line-height: 1.3;
+}
+
+.read-more-link .link-desc {
+  font-size: 0.76rem;
+  color: var(--white-dim);
+  margin-top: 3px;
+  line-height: 1.4;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 1000px) {
+  .grid { grid-template-columns: 1fr; }
+  .grid-2 { grid-template-columns: 1fr; }
+  .span-2, .span-3 { grid-column: span 1; }
+  .scale-ladder { flex-direction: column; }
+  .scale-item::after { display: none; }
+  .footer .vol-links { flex-direction: column; align-items: center; }
+  .read-more-links { flex-direction: column; }
+  .interactive-links { flex-direction: column; }
+  .intro-volumes { flex-direction: column; }
+  .public-intro { padding: 30px 24px 28px; }
+  .public-intro h2 { font-size: 1.4rem; }
+}
+
+@media print {
+  body { background: white; color: #111; }
+  .card { border: 1px solid #ccc; background: #f9f9f9; }
+}
+</style>
+</head>
+<body>
+<div class="poster">
+
+<!-- ════════════ HEADER ════════════ -->
+<header class="header">
+  <div class="greek-alpha">α<span style="font-size:0.45em; letter-spacing:0.1em; color:var(--gold); vertical-align:baseline; position:relative; top:-0.05em; opacity:0.8;">LGQV</span> <span style="font-size:0.45em; letter-spacing:0.14em; color:var(--gold); vertical-align:baseline; position:relative; top:-0.05em;">THEORY</span></div>
+  <h1>A Dark-Sector-Free Cosmology</h1>
+  <p class="subtitle">Local Gravity of Quantum Vacuum — One Action, Zero Free Parameters, 23 Derived Quantities</p>
+  <p class="author-line">
+    Boris Kriger &nbsp;·&nbsp; Institute of Integrative and Interdisciplinary Research &nbsp;·&nbsp; Toronto, 2026<br>
+    <a href="mailto:boriskriger@interdisciplinary-institute.org">boriskriger@interdisciplinary-institute.org</a> &nbsp;·&nbsp;
+    <a href="https://orcid.org/0009-0001-0034-2903" target="_blank">ORCID 0009-0001-0034-2903</a>
+  </p>
+</header>
+
+<!-- ════════════ PUBLIC INTRODUCTION ════════════ -->
+<div class="public-intro">
+  <div class="intro-eyebrow">Start here — no physics degree required</div>
+  <h2>What if 95% of the universe isn't actually missing?</h2>
+  <div class="intro-body">
+    <p>Modern cosmology tells us that everything we can see — every star, every galaxy, every atom — makes up only 5% of the universe. The rest is supposedly made of <span class="hl">dark matter</span> (27%) and <span class="hl">dark energy</span> (68%) — invisible substances that have never been directly detected despite decades of searching.</p>
+    <p>This theory proposes a simpler answer. Empty space itself has energy — this is experimentally confirmed (the Casimir effect, the Lamb shift). Energy has mass (Einstein's E = mc²). Mass gravitates (general relativity). So the energy of empty space <em>must</em> gravitate. The question is not <em>whether</em> it does, but <em>how</em>.</p>
+    <p>In 1967, a physicist named Zel'dovich <em>assumed</em> that vacuum energy contributes to cosmic expansion uniformly everywhere. This assumption was never proved — it was simply adopted. If you remove it, and instead allow vacuum energy to gravitate <span class="hl">locally</span> — accumulating inside galaxies, responding to the presence of ordinary matter — then the "missing mass" in galaxies is not missing at all. It is the weight of the vacuum itself, trapped inside gravitational wells.</p>
+    <p>The coupling between matter and vacuum is not a guess. It is measured in nuclear physics laboratories — the same experiments that tell us how protons hold together. From this single measured number, the theory derives the cosmological constant (off by a factor of 1.65, replacing the standard mismatch of 10<sup>120</sup>), the ratio of matter to light in the universe (1.2% agreement), three lepton masses, the shape of galaxy rotation curves, and 23 quantities total — all from one equation, with <span class="hl">zero adjustable parameters</span>.</p>
+    <p>No new particles. No new forces. No dark anything. Just established physics — quantum chromodynamics, general relativity, and E = mc² — connected in a way that was overlooked for sixty years.</p>
+  </div>
+
+  <div class="read-more-links">
+    <a href="https://medium.com/@krigerbruce/the-end-of-dark-cosmology-30a63c786565" target="_blank" class="read-more-link">
+      <div class="link-icon">I</div>
+      <div class="link-text">
+        <div class="link-label">Read on Medium</div>
+        <div class="link-title">The End of Dark Cosmology</div>
+        <div class="link-desc">What if vacuum gravitates locally? The core idea explained from first principles.</div>
+      </div>
+    </a>
+    <a href="https://medium.com/@krigerbruce/introduction-to-the-new-old-cosmology-back-to-normal-b0ec961f203f" target="_blank" class="read-more-link">
+      <div class="link-icon">II</div>
+      <div class="link-text">
+        <div class="link-label">Read on Medium</div>
+        <div class="link-title">The New Old Cosmology: Back to Normal</div>
+        <div class="link-desc">How separating two quantities restores simplicity to the universe.</div>
+      </div>
+    </a>
+    <a href="https://medium.com/@krigerbruce/the-true-shape-of-the-universe-beyond-big-bang-and-singularities-6b055b3e2cf0" target="_blank" class="read-more-link">
+      <div class="link-icon">III</div>
+      <div class="link-text">
+        <div class="link-label">Read on Medium</div>
+        <div class="link-title">The True Shape of the Universe</div>
+        <div class="link-desc">Beyond Big Bang and singularities — the Block Universe and the Pole of spacetime.</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="interactive-links">
+    <a href="https://boriskriger.github.io/publicationsiiir/RP3_Cosmology_Interactive_Visualizations.html" target="_blank" class="interactive-link">
+      <div class="ilink-icon">◎</div>
+      <div class="ilink-text">
+        <div class="ilink-label">Interactive Model</div>
+        <div class="ilink-title">RP³ Cosmology Visualisations</div>
+        <div class="ilink-desc">Explore the topology, the two attractors, the Pole, and the Block Universe structure in 3D.</div>
+      </div>
+    </a>
+    <a href="https://boriskriger.github.io/publicationsiiir/alphalgqv_calculator.html" target="_blank" class="interactive-link">
+      <div class="ilink-icon">≡</div>
+      <div class="ilink-text">
+        <div class="ilink-label">Interactive Calculator</div>
+        <div class="ilink-title">αLGQV Rotation Curve Calculator</div>
+        <div class="ilink-desc">Fit vacuum halo profiles to SPARC galaxy rotation curves. Compare ISO vacuum, NFW, and MOND.</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="intro-volumes">
+    <a href="https://doi.org/10.5281/zenodo.19027460" target="_blank" class="intro-vol">
+      <div class="iv-num">Volume I</div>
+      <div class="iv-title">The Local Gravitation of Quantum Vacuum:<br>A Unified Solution to the Dark Sector</div>
+      <div class="iv-meta">Papers #1–17 &nbsp;·&nbsp; 569 pages</div>
+      <div class="iv-doi">doi.org/10.5281/zenodo.19027460</div>
+    </a>
+    <a href="https://doi.org/10.13140/RG.2.2.29913.28002" target="_blank" class="intro-vol">
+      <div class="iv-num">Volume II</div>
+      <div class="iv-title">The Consistent Universe — Singularities Resolved,<br>Dark Sector Dissolved, Parameters Derived</div>
+      <div class="iv-meta">Papers #18–38 + Programme Related Correspondence &nbsp;·&nbsp; 579 pages</div>
+      <div class="iv-doi">doi.org/10.13140/RG.2.2.29913.28002</div>
+    </a>
+  </div>
+
+  <div class="cite-block">
+    <div class="cite-label">How to cite (APA 7th)</div>
+    <p class="cite-text">Kriger, B. (2026). <em>Volume I: The local gravitation of quantum vacuum: A unified solution to the dark sector</em> (αLGQV Theory Monograph). IIIR Cosmology and Theoretical Physics. <a href="https://doi.org/10.5281/zenodo.19027460" target="_blank">https://doi.org/10.5281/zenodo.19027460</a></p>
+    <p class="cite-text">Kriger, B. (2026). <em>Volume II: The consistent universe — Singularities resolved, dark sector dissolved, parameters derived</em> (A dark-sector-free cosmology: Local gravity of quantum vacuum; αLGQV Theory Monograph). IIIR Cosmology and Theoretical Physics. <a href="https://doi.org/10.13140/RG.2.2.29913.28002" target="_blank">https://doi.org/10.13140/RG.2.2.29913.28002</a></p>
+  </div>
+</div>
+<div class="section-title"><span>The Single Conceptual Move</span></div>
+
+<div class="grid">
+  <div class="card span-3">
+    <div class="card-label">Foundation</div>
+    <h2>Λ and ρ<sub>vac</sub> are physically distinct quantities</h2>
+    <p>In 1967, Zel'dovich <em>assumed</em> that the cosmological constant Λ (a geometric property of the Einstein equations) equals 8πG × the quantum vacuum energy density ρ<sub>vac</sub> (a field-theoretic quantity). This identification was never derived from a fundamental principle. <span class="hl">It was postulated.</span></p>
+    <p>Five independent theoretical frameworks support the separation: trace-free Einstein gravity (Ellis 2011), Kaloper–Padilla sequestering, Volovik's condensed-matter analogy, Solà Peracaula's running vacuum, and Brown's QKDE. Removing the identification dissolves the vacuum catastrophe (10<sup>120</sup> discrepancy) and opens a chain of consequences that reproduces the effects of dark matter and dark energy without either.</p>
+    <div class="eq-box">
+      <span id="eq-action"></span>
+      <span class="eq-label">The complete action — two modifications to Einstein gravity, both fixed by measurement</span>
+    </div>
+    <p style="text-align:center; font-size:0.82rem;">
+      <span class="hl-cyan">R²/(6M²)</span> — elastic stiffness of spacetime (Starobinsky inflation, M fixed by CMB amplitude A<sub>s</sub>)&emsp;
+      <span class="hl">(1 + 2α)ℒ<sub>m</sub></span> — vacuum–matter coupling (α derived from QCD sigma terms)
+    </p>
+  </div>
+</div>
+
+<!-- ════════════ THE DERIVATION ════════════ -->
+<div class="section-title"><span>Derivation of α from QCD</span></div>
+
+<div class="grid">
+  <div class="card accent-blue span-2">
+    <div class="card-label">Derivation Chain</div>
+    <h2>Six steps — each using standard physics</h2>
+    <div class="chain">
+      <div class="chain-step">
+        <div class="chain-num">1</div>
+        <div class="chain-text">
+          <strong>QCD chiral condensate ⟨q̄q⟩ exists</strong>
+          <span>Non-zero vacuum expectation value — established by lattice QCD, order parameter of chiral symmetry breaking.</span>
+        </div>
+      </div>
+      <div class="chain-step">
+        <div class="chain-num">2</div>
+        <div class="chain-text">
+          <strong>In curved spacetime, vacuum energy responds to curvature R</strong>
+          <span>One-loop Schwinger–DeWitt effective action: ρ<sub>vac</sub>(R) = ρ<sub>vac</sub>(0) + c₁R + c₂R² + … (Schwinger 1951, DeWitt 1965).</span>
+        </div>
+      </div>
+      <div class="chain-step">
+        <div class="chain-num">3</div>
+        <div class="chain-text">
+          <strong>Einstein trace gives R = ρ<sub>m</sub>/m²<sub>Pl</sub></strong>
+          <span>Exact relation in standard GR for non-relativistic matter.</span>
+        </div>
+      </div>
+      <div class="chain-step">
+        <div class="chain-num">4</div>
+        <div class="chain-text">
+          <strong>Therefore δρ<sub>vac</sub> ∝ R ∝ ρ<sub>m</sub></strong>
+          <span>Vacuum energy depends linearly on matter density. The question reduces to: what is the coefficient?</span>
+        </div>
+      </div>
+      <div class="chain-step">
+        <div class="chain-num">5</div>
+        <div class="chain-text">
+          <strong>Coefficient = QCD sigma terms</strong>
+          <span>σ<sub>πN</sub> = 50 MeV (pion-nucleon scattering) + σ<sub>s</sub> = 40 MeV (lattice QCD). Both measured, not fitted. Their sum σ = 90 MeV gives σ/m<sub>N</sub> = 0.096.</span>
+        </div>
+      </div>
+      <div class="chain-step">
+        <div class="chain-num">6</div>
+        <div class="chain-text">
+          <strong>α = f<sub>b</sub> × σ / (m<sub>N</sub> × screening)</strong>
+          <span>f<sub>b</sub> = 0.156 (baryon fraction, Planck), screening ≈ 3 (N-body). Result: <span class="hl">α = 0.005</span>. Observed (from fσ₈): 0.003. Ratio: 1.67. Zero free parameters.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">Cosmological Constant</div>
+    <h2>Λ₀ from nuclear physics</h2>
+    <p>The trace of the field equations, combined with the self-consistency condition of the matter–vacuum–metric cycle, yields:</p>
+    <div class="eq-box">
+      <span id="eq-lambda"></span>
+    </div>
+    <p><span class="hl">Predicted:</span> 1.8 × 10⁻⁵² m⁻²</p>
+    <p><span class="hl-cyan">Observed:</span> 1.1 × 10⁻⁵² m⁻²</p>
+    <p><span class="hl-green">Ratio: 1.65</span></p>
+    <p style="margin-top:10px;">The Zel'dovich estimate (σ⁴/m²<sub>Pl</sub>) is off by 10⁴². This formula is off by 1.65 — the same factor as in α, from the same screening uncertainty.</p>
+    <div style="margin-top:14px;">
+      <span class="tag tag-vol1">Paper #3a</span>
+      <span class="tag tag-vol2">Paper #19</span>
+      <span class="tag tag-vol2">Paper #26</span>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ VOLUME I: CHAIN OF RESULTS ════════════ -->
+<div class="section-title"><span>Volume I — Foundations &amp; Consequences (Papers #1–17)</span></div>
+
+<div class="grid">
+  <div class="card">
+    <div class="card-label">Cosmological Dynamics</div>
+    <h2>Automatic self-screening</h2>
+    <p>N-body simulations show G<sub>eff</sub> = G(1 + 2α) confines itself to the shrinking overdense volume fraction as structure grows. The σ₈ enhancement is ~3× smaller than linear theory predicts.</p>
+    <p><span class="hl">Simultaneously resolves:</span> JWST early galaxy problem (enhanced early growth) and S₈ tension (moderate late σ₈) — same α, same physics, different epochs.</p>
+    <span class="tag tag-vol1">Paper #9</span>
+  </div>
+
+  <div class="card">
+    <div class="card-label">Galactic Dynamics</div>
+    <h2>Vacuum capture = missing mass</h2>
+    <p>Inside gravitationally bound systems, vacuum energy is trapped and its gravity is uncompensated. The isothermal vacuum profile reproduces:</p>
+    <p>• Flat rotation curves<br>
+    • Baryonic Tully–Fisher (M<sub>b</sub> ∝ v⁴)<br>
+    • Radial acceleration relation with <span class="hl">a₀ ~ √(Λ₀G) ~ 10⁻¹⁰ m/s²</span> — derived, not fitted<br>
+    • Bullet Cluster morphology<br>
+    • Dark-mass-free galaxies (DF2, DF4)</p>
+    <span class="tag tag-vol1">Paper #12</span>
+    <span class="tag tag-vol2">Papers #30a–d</span>
+  </div>
+
+  <div class="card">
+    <div class="card-label">Inflation &amp; CMB</div>
+    <h2>Starobinsky from the action</h2>
+    <p>The R + R² Starobinsky action is <em>derived</em> — not postulated — as the elastic potential of the spacetime membrane. CMB compatibility is demonstrated: at recombination, vacuum perturbations are suppressed by (H₀/H<sub>rec</sub>)² ~ 10⁻¹⁰.</p>
+    <p>The mass hierarchy (10⁵⁵ between inflationary and late-time scales) dissolves as a ratio of curvatures at two excitation branches of the same elastic medium.</p>
+    <span class="tag tag-vol1">Papers #5, 6, 7</span>
+  </div>
+</div>
+
+<!-- ════════════ SCALE HIERARCHY ════════════ -->
+<div class="section-title"><span>Scale Hierarchy of Vacuum Gravity</span></div>
+
+<div class="card span-3" style="margin-bottom: 36px;">
+  <div class="card-label">Why we don't see vacuum gravity locally</div>
+  <div class="scale-ladder">
+    <div class="scale-item">
+      <div class="scale-name">Nucleus</div>
+      <div class="scale-size">r &lt; 1 fm</div>
+      <div class="scale-effect">Zero — sequestered by QCD confinement</div>
+    </div>
+    <div class="scale-item">
+      <div class="scale-name">Atom</div>
+      <div class="scale-size">1 fm – 1 Å</div>
+      <div class="scale-effect">Suppressed — Pauli exclusion screens vacuum modes</div>
+    </div>
+    <div class="scale-item">
+      <div class="scale-name">Stellar</div>
+      <div class="scale-size">~10⁸ m</div>
+      <div class="scale-effect">Negligible — ΔM<sub>Ch</sub>/M<sub>Ch</sub> ~ 10⁻²⁸</div>
+    </div>
+    <div class="scale-item">
+      <div class="scale-name">Galactic</div>
+      <div class="scale-size">~10²⁰ m</div>
+      <div class="scale-effect" style="color: var(--gold-bright);">Dominant — flat rotation curves, Tully–Fisher</div>
+    </div>
+    <div class="scale-item">
+      <div class="scale-name">Cosmological</div>
+      <div class="scale-size">~10²⁴ m</div>
+      <div class="scale-effect" style="color: var(--gold-bright);">Architectural — governs the cosmic web</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ VOLUME II ════════════ -->
+<div class="section-title"><span>Volume II — Beyond Singularities (Papers #18–38)</span></div>
+
+<div class="grid">
+  <div class="card accent-cyan">
+    <div class="card-label">Extreme Densities</div>
+    <h2>The K-Limit</h2>
+    <p>At 3–5× nuclear density, chiral symmetry restoration releases confined QCD vacuum energy into a state with <span class="hl-cyan">w = −1</span>. Vacuum pressure P ∝ ρ matches gravity at all masses — unlike degeneracy pressure (P ∝ ρ<sup>5/3</sup>), which is overcome above a critical mass.</p>
+    <div class="eq-box small">
+      <span id="eq-klimit"></span>
+      <span class="eq-label">The fourth step in the stability ladder: Eddington → Chandrasekhar → Oppenheimer–Volkoff → Kriger</span>
+    </div>
+    <p>Transition mass <span class="hl-cyan">M<sub>tr</sub> ≈ 4.0 M☉</span> separates vacuum stars (no horizon) from frozen stars (horizon + vacuum core). In both cases: <span class="hl">no singularity</span>.</p>
+    <span class="tag tag-vol2">Papers #31a, 31b</span>
+  </div>
+
+  <div class="card accent-cyan">
+    <div class="card-label">Cosmological Origin</div>
+    <h2>The Pole of Spacetime</h2>
+    <p>The Big Bang singularity is replaced by a <span class="hl-cyan">topological pole</span> — a smooth extremum of finite density (~10⁷³ kg/m³, 23 orders below Planck). The universe at the Pole is a compact S³ of radius R₀ ≈ 15 AU filled with quark–gluon–vacuum plasma (QGVP).</p>
+    <p>"Before" has no meaning — not because time was created, but because the coordinate is exhausted. Asking "what was before the Big Bang" is asking what is north of the North Pole.</p>
+    <span class="tag tag-vol2">Paper #31b</span>
+  </div>
+
+  <div class="card accent-cyan">
+    <div class="card-label">Collapsed Objects</div>
+    <h2>Kgr-Radiation</h2>
+    <p>The de Sitter interior of the QGVP core has a <em>reversed</em> time dilation profile: fastest clock at the centre. The core oscillates between confinement and deconfinement states. This oscillation of g<sub>tt</sub> itself constitutes a new class of gravitational radiation — <span class="hl-cyan">Kgr-Radiation</span>.</p>
+    <p>Predicted for Sgr A*: f ~ 5–50 Hz, h ~ 10⁻³⁰–10⁻²⁵. Below current LIGO, within reach of the Einstein Telescope.</p>
+    <span class="tag tag-vol2">Papers #32, 33</span>
+  </div>
+</div>
+
+<div class="grid">
+  <div class="card accent-purple">
+    <div class="card-label">Block Universe</div>
+    <h2>Two-Attractor Architecture</h2>
+    <p>The universe is a 4D static manifold bounded by two topological attractors:</p>
+    <p><span class="hl">Attractor A (Pole)</span> — maximal metric deformation. S³ at 15 AU, nuclear density, 155 MeV. The seed.</p>
+    <p><span class="hl">Attractor B (Relaxation)</span> — fully relaxed membrane, crystallised cosmic web, structural stillness. Not heat death — the frozen lattice.</p>
+    <p>Cosmic expansion is <em>passive geometric relaxation</em> — the return of a deformed elastic membrane to its ground state. Not driven by a repulsive substance.</p>
+    <span class="tag tag-vol2">Paper #18</span>
+  </div>
+
+  <div class="card accent-purple">
+    <div class="card-label">Topology</div>
+    <h2>RP³ with double counter-rotation</h2>
+    <p>Uniqueness of physical constants → unique Banach fixed point → compactness. Perelman's theorem → S³. CPT symmetry (10⁻¹⁸ precision) → antipodal identification S³/Z₂ = <span class="hl">RP³</span>.</p>
+    <p>Circumference: ~435 billion light-years (17× observable volume). Total energy: exactly zero (theorem). Curvature: Ω<sub>K</sub> = −0.044.</p>
+    <span class="tag tag-vol2">Paper #27</span>
+  </div>
+
+  <div class="card accent-purple">
+    <div class="card-label">Particle Physics</div>
+    <h2>Six problems, zero new particles</h2>
+    <p>From the same α and action:</p>
+    <p>• Three generations — excitation levels within QCD confinement window<br>
+    • Strong CP: θ = 0 as unique functional attractor of the neutron<br>
+    • Baryon-to-photon ratio: <span class="hl">η = α⁴ = 6.20 × 10⁻¹⁰</span> (obs: 6.12 × 10⁻¹⁰, 1.2%)<br>
+    • Baryogenesis dissolved on atemporal manifold<br>
+    • Muon g−2: 1% HVP shift from (1+2α)ℒ<sub>m</sub><br>
+    • Neutron fine-tuning: six functions, one fixed point</p>
+    <span class="tag tag-vol2">Paper #29</span>
+  </div>
+</div>
+
+<!-- ════════════ 23 QUANTITIES ════════════ -->
+<div class="section-title"><span>23 Quantities from One Action</span></div>
+
+<div class="grid-2">
+  <div class="card span-2">
+    <div class="card-label">Quantitative Results</div>
+    <div class="result-row result-header">
+      <span class="result-label">Quantity</span>
+      <span class="result-pred">Predicted</span>
+      <span class="result-obs">Observed</span>
+      <span class="result-ratio">Ratio</span>
+    </div>
+    <div class="result-row">
+      <span class="result-label">Vacuum–matter coupling α</span>
+      <span class="result-pred">0.005</span>
+      <span class="result-obs">0.003</span>
+      <span class="result-ratio ratio-ok">1.67</span>
+    </div>
+    <div class="result-row">
+      <span class="result-label">Cosmological constant Λ₀ (m⁻²)</span>
+      <span class="result-pred">1.8 × 10⁻⁵²</span>
+      <span class="result-obs">1.1 × 10⁻⁵²</span>
+      <span class="result-ratio ratio-ok">1.65</span>
+    </div>
+    <div class="result-row">
+      <span class="result-label">Baryon-to-photon ratio η</span>
+      <span class="result-pred">6.20 × 10⁻¹⁰</span>
+      <span class="result-obs">6.12 × 10⁻¹⁰</span>
+      <span class="result-ratio ratio-good">1.01</span>
+    </div>
+    <div class="result-row">
+      <span class="result-label">Spectral index n<sub>s</sub></span>
+      <span class="result-pred">0.964</span>
+      <span class="result-obs">0.965</span>
+      <span class="result-ratio ratio-good">1.001</span>
+    </div>
+    <div class="result-row">
+      <span class="result-label">Mass hierarchy</span>
+      <span class="result-pred">1.5 × 10⁵⁵</span>
+      <span class="result-obs">~10⁵⁵</span>
+      <span class="result-ratio ratio-good">~1</span>
+    </div>
+    <div class="result-row">
+      <span class="result-label">Koide mass scale M²</span>
+      <span class="result-pred">312.8 MeV</span>
+      <span class="result-obs">313.8 MeV</span>
+      <span class="result-ratio ratio-good">1.003</span>
+    </div>
+    <div class="result-row">
+      <span class="result-label">Muon mass m<sub>μ</sub></span>
+      <span class="result-pred">105 MeV</span>
+      <span class="result-obs">105.7 MeV</span>
+      <span class="result-ratio ratio-good">0.993</span>
+    </div>
+    <div class="result-row">
+      <span class="result-label">Tau mass m<sub>τ</sub></span>
+      <span class="result-pred">1770 MeV</span>
+      <span class="result-obs">1777 MeV</span>
+      <span class="result-ratio ratio-good">0.996</span>
+    </div>
+    <div class="result-row">
+      <span class="result-label">Electron mass m<sub>e</sub></span>
+      <span class="result-pred">0.66 MeV</span>
+      <span class="result-obs">0.511 MeV</span>
+      <span class="result-ratio ratio-ok">1.29</span>
+    </div>
+    <div class="result-row">
+      <span class="result-label">Planck mass self-consistency</span>
+      <span class="result-pred">2.44 × 10¹⁸ GeV</span>
+      <span class="result-obs">2.44 × 10¹⁸ GeV</span>
+      <span class="result-ratio ratio-good">1.000</span>
+    </div>
+    <div class="result-row">
+      <span class="result-label">Tensor-to-scalar ratio r</span>
+      <span class="result-pred">~0.003–0.004</span>
+      <span class="result-obs" style="color: var(--white-dim);">testable</span>
+      <span class="result-ratio" style="color: var(--white-dim);">—</span>
+    </div>
+    <div class="result-row">
+      <span class="result-label">Tidal Love numbers k₂</span>
+      <span class="result-pred">&gt; 0 (M &gt; M<sub>OV</sub>)</span>
+      <span class="result-obs" style="color: var(--white-dim);">testable</span>
+      <span class="result-ratio" style="color: var(--white-dim);">—</span>
+    </div>
+    <p style="margin-top: 12px; font-size: 0.78rem; color: var(--white-dim);">
+      7 match to &lt;1% &nbsp;·&nbsp; 3 match within factor 1.7 (same screening source) &nbsp;·&nbsp; 5 are testable predictions &nbsp;·&nbsp; All from one action, zero adjusted parameters.
+    </p>
+  </div>
+</div>
+
+<!-- ════════════ SPARC ════════════ -->
+<div class="section-title"><span>Observational Tests — 68 SPARC Galaxies</span></div>
+
+<div class="grid">
+  <div class="card accent-green">
+    <div class="card-label">Dwarf Irregulars — 31 galaxies</div>
+    <h2>Vacuum profile vs NFW</h2>
+    <p>ISO vacuum outperforms NFW for <span class="hl-green">21 of 31</span> galaxies at equal parameter count (2 free parameters each).</p>
+    <p>Median χ²<sub>ν</sub>: <span class="hl-green">0.22</span> (vacuum) vs 0.34 (NFW)</p>
+    <p>DDO 154 (benchmark cusp–core galaxy): χ²<sub>ν</sub> = 1.89 vs 8.76 for NFW.</p>
+    <span class="tag tag-vol2">Paper #30b</span>
+    <span class="tag tag-test">MNRAS</span>
+  </div>
+
+  <div class="card accent-green">
+    <div class="card-label">Low-Surface-Brightness — 14 galaxies</div>
+    <h2>Dark-matter-dominated regime</h2>
+    <p>Vacuum profile outperforms NFW for <span class="hl-green">11 of 14</span> galaxies.</p>
+    <p>Median χ²<sub>ν</sub>: <span class="hl-green">0.32</span> (vacuum) vs 1.08 (NFW)</p>
+    <p>LSB galaxies are DM-dominated at all radii — near-ideal laboratory for testing halo models with minimal baryonic contamination.</p>
+    <span class="tag tag-vol2">Paper #30c</span>
+    <span class="tag tag-test">A&amp;A</span>
+  </div>
+
+  <div class="card accent-green">
+    <div class="card-label">Massive Spirals — 18 galaxies</div>
+    <h2>Baryons and dark matter compete</h2>
+    <p>V<sub>flat</sub> &gt; 150 km/s, Hubble types T = 2–5. The challenging regime where baryonic and dark components are comparable.</p>
+    <p>Full Hubble-sequence sample (5 galaxies): vacuum outperforms NFW for 4 of 5 at equal parameter count.</p>
+    <span class="tag tag-vol2">Papers #30, 30a, 30d</span>
+    <span class="tag tag-test">RNAAS</span>
+  </div>
+</div>
+
+<!-- ════════════ FALSIFICATION ════════════ -->
+<div class="section-title"><span>Falsification Programme</span></div>
+
+<div class="grid-2">
+  <div class="card accent-red">
+    <div class="card-label">Six observations that would refute the model</div>
+    <h2>Hard falsification criteria</h2>
+    <div class="false-item">
+      <div class="false-icon">✕</div>
+      <span>Detection of a dark matter particle at any mass</span>
+    </div>
+    <div class="false-item">
+      <div class="false-icon">✕</div>
+      <span>Derivation of the Zel'dovich identification Λ = 8πGρ<sub>vac</sub> from a fundamental principle</span>
+    </div>
+    <div class="false-item">
+      <div class="false-icon">✕</div>
+      <span>α excluded from the range 0.001–0.01 at &gt;5σ by growth-rate data</span>
+    </div>
+    <div class="false-item">
+      <div class="false-icon">✕</div>
+      <span>Tidal Love numbers k₂ = 0 exactly for objects above the OV limit (i.e. classical Kerr confirmed)</span>
+    </div>
+    <div class="false-item">
+      <div class="false-icon">✕</div>
+      <span>No correlation of dark-to-luminous mass ratio with distance from group centre</span>
+    </div>
+    <div class="false-item">
+      <div class="false-icon">✕</div>
+      <span>Rotation curves smooth beyond the predicted vacuum capture radius with no decline</span>
+    </div>
+  </div>
+
+  <div class="card accent-green">
+    <div class="card-label">Testable predictions with specific instruments</div>
+    <h2>Observational targets</h2>
+    <div class="false-item">
+      <div class="false-icon" style="border-color: var(--green); color: var(--green);">→</div>
+      <span><strong>LiteBIRD / CMB-S4:</strong> Tensor-to-scalar ratio r ≈ 0.003–0.004, tilt n<sub>t</sub> ≈ −0.0004</span>
+    </div>
+    <div class="false-item">
+      <div class="false-icon" style="border-color: var(--green); color: var(--green);">→</div>
+      <span><strong>Einstein Telescope:</strong> Kgr-Radiation from Sgr A* at f ~ 5–50 Hz (any signal = discovery, GR predicts zero)</span>
+    </div>
+    <div class="false-item">
+      <div class="false-icon" style="border-color: var(--green); color: var(--green);">→</div>
+      <span><strong>LISA:</strong> Mass-dependent tidal Love numbers k₂ &gt; 0 for supermassive mergers</span>
+    </div>
+    <div class="false-item">
+      <div class="false-icon" style="border-color: var(--green); color: var(--green);">→</div>
+      <span><strong>JWST:</strong> Supermassive seeds 10⁴–10⁵ M☉ at z &gt; 10</span>
+    </div>
+    <div class="false-item">
+      <div class="false-icon" style="border-color: var(--green); color: var(--green);">→</div>
+      <span><strong>DESI / Euclid:</strong> Tangential peculiar velocities along void boundaries; foam junction angles at 120° and 109.47°</span>
+    </div>
+    <div class="false-item">
+      <div class="false-icon" style="border-color: var(--green); color: var(--green);">→</div>
+      <span><strong>DESI / Euclid:</strong> Anisotropic w₀–w<sub>a</sub> deviation correlated with local void/filament structure</span>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ WHAT IT REPLACES ════════════ -->
+<div class="section-title"><span>What the Framework Uses &amp; What It Eliminates</span></div>
+
+<div class="grid-2">
+  <div class="card">
+    <div class="card-label">Uses only</div>
+    <h2>Established physics</h2>
+    <p style="font-size: 0.92rem;">
+      <span class="hl">Quantum Chromodynamics</span> — sigma terms, chiral condensate, confinement<br><br>
+      <span class="hl">General Relativity</span> — Einstein field equations, trace-free formulation<br><br>
+      <span class="hl">E = mc²</span> — vacuum energy has equivalent mass<br><br>
+      <span class="hl">Casimir effect</span> — vacuum energy depends on geometry<br><br>
+      <span class="hl">Starobinsky R²</span> — elastic stiffness of spacetime
+    </p>
+  </div>
+
+  <div class="card accent-red">
+    <div class="card-label">Eliminates</div>
+    <h2>No new entities</h2>
+    <p style="font-size: 0.92rem;">
+      <span style="text-decoration: line-through; color: var(--red);">Dark matter particles</span> — replaced by gravitating vacuum<br><br>
+      <span style="text-decoration: line-through; color: var(--red);">Dark energy / quintessence</span> — replaced by metric relaxation<br><br>
+      <span style="text-decoration: line-through; color: var(--red);">Inflaton field</span> — replaced by elastic recoil of spacetime<br><br>
+      <span style="text-decoration: line-through; color: var(--red);">Singularities</span> — replaced by K-Limit (finite-density cores)<br><br>
+      <span style="text-decoration: line-through; color: var(--red);">Fine-tuning</span> — replaced by fixed-point self-consistency<br><br>
+      <span style="text-decoration: line-through; color: var(--red);">Free parameters</span> — all 23 quantities derived
+    </p>
+  </div>
+</div>
+
+<!-- ════════════ FOOTER ════════════ -->
+<footer class="footer">
+  <p style="font-size: 0.85rem; color: var(--white-dim); margin-bottom: 8px;">
+    Boris Kriger &nbsp;·&nbsp; Institute of Integrative and Interdisciplinary Research &nbsp;·&nbsp; Department of Cosmology and Theoretical Physics &nbsp;·&nbsp; Toronto, Canada
+  </p>
+  <p style="font-size: 0.85rem; color: var(--white-dim); margin-bottom: 16px;">
+    boriskriger@interdisciplinary-institute.org &nbsp;·&nbsp; ORCID: <a href="https://orcid.org/0009-0001-0034-2903" target="_blank" style="color: var(--gold-dim);">0009-0001-0034-2903</a>
+  </p>
+  <p class="footer-meta">© 2026 Boris Kriger. CC BY 4.0. Two volumes, 1148 pages, 38 papers + correspondence, zero free parameters.</p>
+</footer>
+
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const eqs = {
+    'eq-action': 'S = \\int d^4x\\,\\sqrt{-g}\\;\\left\\{\\;\\frac{m_{Pl}^2}{2}\\left[\\,R + \\frac{R^2}{6M^2} - 2\\Lambda_0\\,\\right] + (1+2\\alpha)\\,\\mathcal{L}_m\\;\\right\\}',
+    'eq-lambda': '\\Lambda_0 \\;=\\; \\alpha \\cdot f_b \\cdot \\frac{\\sigma^6}{m_{Pl}^4}',
+    'eq-klimit': '\\rho_K \\;\\approx\\; 5\\,\\rho_{\\text{nuclear}} \\;\\approx\\; 1.15 \\times 10^{18}\\;\\text{kg/m}^3'
+  };
+  for (const [id, tex] of Object.entries(eqs)) {
+    const el = document.getElementById(id);
+    if (el) katex.render(tex, el, { displayMode: true, throwOnError: false });
+  }
+});
+</script>
+</body>
+</html>
